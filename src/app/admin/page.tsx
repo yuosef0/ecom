@@ -19,21 +19,25 @@ export default function AdminPage() {
     setMessage("");
 
     try {
-      // 1️⃣ رفع الصورة في Supabase Storage
+      // 🧠 استخدم اسم باكت واحد صحيح
+      const bucketName = "products-imges";
       const fileName = `${Date.now()}-${image.name}`;
-      const { data: imageData, error: imageError } = await supabase.storage
-        .from("products-imges")
+
+      // 1️⃣ رفع الصورة إلى Supabase Storage
+      const { error: imageError } = await supabase.storage
+        .from(bucketName)
         .upload(fileName, image);
 
       if (imageError) throw imageError;
 
+      // 2️⃣ جلب رابط الصورة العام
       const { data: urlData } = supabase.storage
-        .from("products-images")
+        .from(bucketName)
         .getPublicUrl(fileName);
 
       const imageUrl = urlData.publicUrl;
 
-      // 2️⃣ إدخال بيانات المنتج في قاعدة البيانات
+      // 3️⃣ إنشاء slug للمنتج وإدخاله في قاعدة البيانات
       const slug = title.toLowerCase().replace(/\s+/g, "-");
 
       const { error: insertError } = await supabase.from("products").insert([
@@ -49,6 +53,7 @@ export default function AdminPage() {
 
       if (insertError) throw insertError;
 
+      // ✅ نجاح العملية
       setMessage("✅ تم إضافة المنتج بنجاح!");
       setTitle("");
       setPrice("");
