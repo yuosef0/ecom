@@ -64,7 +64,7 @@ SELECT
   raw_user_meta_data->>'full_name',
   'super_admin'
 FROM auth.users
-WHERE email = 'YOUR-EMAIL@EXAMPLE.COM'
+WHERE email = 'yuosefmontaser656@gmail.com'
 ON CONFLICT (user_id) DO UPDATE
 SET
   is_active = true,
