@@ -98,13 +98,12 @@ export default function AdminProductsPage() {
 
       if (editingProduct) {
         // تحديث منتج موجود
-        const response = await fetch(`/api/products/${editingProduct.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(productData),
-        });
+        const { error: updateError } = await supabase
+          .from("products")
+          .update(productData)
+          .eq("id", editingProduct.id);
 
-        if (!response.ok) throw new Error("فشل في تحديث المنتج");
+        if (updateError) throw updateError;
 
         setMessage("✅ تم تحديث المنتج بنجاح!");
         setEditingProduct(null);
@@ -137,17 +136,18 @@ export default function AdminProductsPage() {
     if (!confirm(`هل أنت متأكد من حذف المنتج: ${title}؟`)) return;
 
     try {
-      const response = await fetch(`/api/products/${id}`, {
-        method: "DELETE",
-      });
+      const { error: deleteError } = await supabase
+        .from("products")
+        .delete()
+        .eq("id", id);
 
-      if (!response.ok) throw new Error("فشل في حذف المنتج");
+      if (deleteError) throw deleteError;
 
       setMessage("✅ تم حذف المنتج بنجاح!");
       fetchProducts();
     } catch (error: any) {
       console.error("خطأ في حذف المنتج:", error);
-      setMessage("❌ فشل في حذف المنتج");
+      setMessage("❌ فشل في حذف المنتج: " + error.message);
     }
   };
 
