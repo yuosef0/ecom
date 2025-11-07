@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useCart } from "../contexts/CartContext";
 import Link from "next/link";
+import Header from "../components/Header";
 
 interface Product {
   id: string;
@@ -87,33 +88,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-900">🛍️ متجري</h1>
-          
-          <div className="flex gap-4">
-            <Link 
-              href="/cart" 
-              className="relative bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
-            >
-              🛒 السلة
-              {totalItems > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-6 h-6 rounded-full flex items-center justify-center font-bold">
-                  {totalItems}
-                </span>
-              )}
-            </Link>
-            
-            <Link 
-              href="/admin" 
-              className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition"
-            >
-              ⚙️ الإدارة
-            </Link>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       {/* Products Grid */}
       <div className="max-w-7xl mx-auto px-4 py-10">
