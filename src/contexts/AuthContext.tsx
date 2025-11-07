@@ -8,6 +8,8 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  isAdmin: boolean;
+  adminRole: string | null;
   signInWithEmail: (email: string, password: string) => Promise<{ error: any }>;
   signUpWithEmail: (email: string, password: string, fullName: string) => Promise<{ error: any }>;
   signInWithGoogle: () => Promise<{ error: any }>;
@@ -20,6 +22,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [adminRole, setAdminRole] = useState<string | null>(null);
 
   useEffect(() => {
     // جلب الجلسة الحالية
@@ -40,6 +44,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // التحقق من صلاحيات الأدمن
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      if (user) {
+        try {
+          const { data, error } = await supabase
+            .from("admins")
+            .select("role, is_active")
+            .eq("user_id", user.id)
+            .eq("is_active", true)
+            .single();
+
+          if (data && !error) {
+            setIsAdmin(true);
+            setAdminRole(data.role);
+          } else {
+            setIsAdmin(false);
+            setAdminRole(null);
+          }
+        } catch (error) {
+          setIsAdmin(false);
+          setAdminRole(null);
+        }
+      } else {
+        setIsAdmin(false);
+        setAdminRole(null);
+      }
+    };
+
+    checkAdminStatus();
+  }, [user]);
 
   // تسجيل الدخول بالبريد الإلكتروني
   const signInWithEmail = async (email: string, password: string) => {
@@ -85,6 +121,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     user,
     session,
     loading,
+    isAdmin,
+    adminRole,
     signInWithEmail,
     signUpWithEmail,
     signInWithGoogle,

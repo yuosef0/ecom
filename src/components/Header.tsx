@@ -6,7 +6,7 @@ import { useCart } from "../contexts/CartContext";
 import { useState } from "react";
 
 export default function Header() {
-  const { user, signOut } = useAuth();
+  const { user, signOut, isAdmin } = useAuth();
   const { cart } = useCart();
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -124,10 +124,10 @@ export default function Header() {
                         >
                           📦 طلباتي
                         </Link>
-                        {user.email === "admin@example.com" && (
+                        {isAdmin && (
                           <Link
                             href="/admin"
-                            className="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition"
+                            className="block px-4 py-2 text-blue-600 hover:bg-blue-50 transition font-medium"
                             onClick={() => setShowDropdown(false)}
                           >
                             ⚙️ لوحة التحكم
