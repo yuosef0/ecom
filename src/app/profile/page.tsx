@@ -85,8 +85,21 @@ export default function ProfilePage() {
 
       if (error) {
         // التحقق من نوع الخطأ
-        if (error.code === "42P01" || error.message?.includes("relation") || error.message?.includes("does not exist")) {
-          setMessage("❌ جدول profiles غير موجود. يرجى تشغيل ملف create-profiles-table.sql في Supabase أولاً");
+        if (
+          error.code === "42P01" ||
+          error.message?.includes("relation") ||
+          error.message?.includes("does not exist") ||
+          error.message?.includes("could not find") ||
+          error.message?.includes("schema cache")
+        ) {
+          setMessage(`❌ جدول profiles غير موجود في قاعدة البيانات.
+
+الحل:
+1. افتح Supabase Dashboard → SQL Editor
+2. افتح ملف: create-profiles-table.sql
+3. انسخ المحتوى والصقه في SQL Editor
+4. اضغط Run ▶️
+5. حدّث هذه الصفحة`);
         } else {
           throw error;
         }
@@ -94,7 +107,23 @@ export default function ProfilePage() {
         setMessage("✅ تم تحديث الملف الشخصي بنجاح");
       }
     } catch (error: any) {
-      setMessage("❌ حدث خطأ: " + (error.message || "خطأ غير معروف"));
+      // التحقق مرة أخرى على مستوى catch
+      if (
+        error.message?.includes("could not find") ||
+        error.message?.includes("schema cache") ||
+        error.message?.includes("profiles")
+      ) {
+        setMessage(`❌ جدول profiles غير موجود في قاعدة البيانات.
+
+الحل:
+1. افتح Supabase Dashboard → SQL Editor
+2. افتح ملف: create-profiles-table.sql
+3. انسخ المحتوى والصقه في SQL Editor
+4. اضغط Run ▶️
+5. حدّث هذه الصفحة`);
+      } else {
+        setMessage("❌ حدث خطأ: " + (error.message || "خطأ غير معروف"));
+      }
     } finally {
       setUpdating(false);
     }
