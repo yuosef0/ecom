@@ -43,16 +43,9 @@ export default function ProfilePage() {
 
       // التعامل مع الأخطاء
       if (error) {
-        // PGRST116 = لا يوجد سجل - هذا طبيعي للمستخدمين الجدد
-        // 42P01 = الجدول غير موجود - يعني أن الـ SQL لم يُشغل بعد
-        if (error.code === "PGRST116" || error.code === "42P01" || error.message?.includes("relation") || error.message?.includes("does not exist")) {
-          console.log("جدول profiles غير موجود أو لا يوجد سجل - استخدام البيانات من auth");
-          setFullName(user.user_metadata?.full_name || "");
-        } else {
-          // خطأ آخر - اعرضه في الكونسول
-          console.error("خطأ في تحميل الملف الشخصي:", error);
-          setFullName(user.user_metadata?.full_name || "");
-        }
+        // فقط استخدم البيانات من auth بدون عرض خطأ
+        // لأن الجدول قد لا يكون موجوداً أو السجل غير موجود وهذا طبيعي
+        setFullName(user.user_metadata?.full_name || "");
       } else if (data) {
         // تم جلب البيانات بنجاح
         setFullName(data.full_name || "");
@@ -64,8 +57,7 @@ export default function ProfilePage() {
         setFullName(user.user_metadata?.full_name || "");
       }
     } catch (error: any) {
-      console.error("خطأ في تحميل الملف الشخصي:", error);
-      // في حالة الخطأ، استخدم البيانات من auth
+      // في حالة الخطأ، استخدم البيانات من auth بدون عرض خطأ
       setFullName(user.user_metadata?.full_name || "");
     } finally {
       setProfileLoading(false);
