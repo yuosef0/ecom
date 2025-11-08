@@ -14,7 +14,10 @@ interface Product {
   description: string | null;
   price: number;
   image_url: string | null;
+  images: string[];
   stock: number;
+  sizes: string[];
+  colors: { name: string; hex: string }[];
   created_at: string;
 }
 
@@ -106,72 +109,102 @@ export default function Home() {
           <>
             <h2 className="text-2xl font-bold mb-6">المنتجات المتاحة ({products.length})</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {products.map((product) => (
-                <div
-                  key={product.id}
-                  className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition"
-                >
-                  {/* Product Image */}
-                  <div className="relative h-48 bg-gray-200">
-                    {product.image_url ? (
-                      <img
-                        src={product.image_url}
-                        alt={product.title}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex items-center justify-center h-full text-gray-400">
-                        📦 بدون صورة
-                      </div>
-                    )}
-                    
-                    {/* Stock Badge */}
-                    {product.stock === 0 && (
-                      <div className="absolute top-2 right-2 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                        نفذت الكمية
-                      </div>
-                    )}
-                  </div>
+              {products.map((product) => {
+                const productImage = product.images && product.images.length > 0
+                  ? product.images[0]
+                  : product.image_url || null;
 
-                  {/* Product Info */}
-                  <div className="p-4">
-                    <h3 className="font-bold text-lg mb-2 line-clamp-1">
-                      {product.title}
-                    </h3>
-                    
-                    {product.description && (
-                      <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                        {product.description}
-                      </p>
-                    )}
+                return (
+                  <div
+                    key={product.id}
+                    className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition"
+                  >
+                    {/* Product Image - Clickable */}
+                    <Link href={`/products/${product.id}`}>
+                      <div className="relative h-48 bg-gray-200 cursor-pointer">
+                        {productImage ? (
+                          <img
+                            src={productImage}
+                            alt={product.title}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex items-center justify-center h-full text-gray-400">
+                            📦 بدون صورة
+                          </div>
+                        )}
 
-                    <div className="flex justify-between items-center">
-                      <span className="text-2xl font-bold text-blue-600">
-                        {product.price.toFixed(2)} ج.م
-                      </span>
-                      <span className="text-sm text-gray-500">
-                        متوفر: {product.stock}
-                      </span>
+                        {/* Stock Badge */}
+                        {product.stock === 0 && (
+                          <div className="absolute top-2 right-2 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                            نفذت الكمية
+                          </div>
+                        )}
+                      </div>
+                    </Link>
+
+                    {/* Product Info */}
+                    <div className="p-4">
+                      <Link href={`/products/${product.id}`}>
+                        <h3 className="font-bold text-lg mb-2 line-clamp-1 cursor-pointer hover:text-blue-600 transition">
+                          {product.title}
+                        </h3>
+                      </Link>
+
+                      {product.description && (
+                        <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                          {product.description}
+                        </p>
+                      )}
+
+                      <div className="flex justify-between items-center mb-3">
+                        <span className="text-2xl font-bold text-blue-600">
+                          {product.price.toFixed(2)} ج.م
+                        </span>
+                        <span className="text-sm text-gray-500">
+                          متوفر: {product.stock}
+                        </span>
+                      </div>
+
+                      {/* Quick Info */}
+                      {(product.sizes?.length > 0 || product.colors?.length > 0) && (
+                        <div className="flex gap-2 mb-3 text-xs text-gray-500">
+                          {product.sizes?.length > 0 && (
+                            <span>📏 {product.sizes.length} مقاس</span>
+                          )}
+                          {product.colors?.length > 0 && (
+                            <span>🎨 {product.colors.length} لون</span>
+                          )}
+                        </div>
+                      )}
+
+                      <div className="flex gap-2">
+                        <Link
+                          href={`/products/${product.id}`}
+                          className="flex-1 bg-gray-100 text-gray-800 py-2 rounded-lg font-semibold hover:bg-gray-200 transition text-center"
+                        >
+                          عرض التفاصيل
+                        </Link>
+                        <button
+                          onClick={() => handleAddToCart(product)}
+                          disabled={product.stock === 0}
+                          className={`flex-1 py-2 rounded-lg font-semibold transition ${
+                            addedProducts.has(product.id)
+                              ? "bg-green-600 text-white"
+                              : "bg-blue-600 text-white hover:bg-blue-700"
+                          } disabled:bg-gray-300 disabled:cursor-not-allowed`}
+                        >
+                          {product.stock === 0
+                            ? "غير متوفر"
+                            : addedProducts.has(product.id)
+                            ? "✓"
+                            : "🛒"}
+                        </button>
+                      </div>
                     </div>
-
-                    <button
-                      onClick={() => handleAddToCart(product)}
-                      disabled={product.stock === 0}
-                      className={`w-full mt-4 py-2 rounded-lg font-semibold transition ${
-                        addedProducts.has(product.id)
-                          ? "bg-green-600 text-white"
-                          : "bg-blue-600 text-white hover:bg-blue-700"
-                      } disabled:bg-gray-300 disabled:cursor-not-allowed`}
-                    >
-                      {product.stock === 0 
-                        ? "غير متوفر" 
-                        : addedProducts.has(product.id)
-                        ? "✓ تمت الإضافة"
-                        : "إضافة للسلة"}
-                    </button>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </>
         )}
