@@ -41,18 +41,26 @@ export default function ProfilePage() {
         .eq("id", user.id)
         .single();
 
-      if (error && error.code !== "PGRST116") {
-        // PGRST116 = لا يوجد سجل
-        throw error;
-      }
-
-      if (data) {
+      // التعامل مع الأخطاء
+      if (error) {
+        // PGRST116 = لا يوجد سجل - هذا طبيعي للمستخدمين الجدد
+        // 42P01 = الجدول غير موجود - يعني أن الـ SQL لم يُشغل بعد
+        if (error.code === "PGRST116" || error.code === "42P01" || error.message?.includes("relation") || error.message?.includes("does not exist")) {
+          console.log("جدول profiles غير موجود أو لا يوجد سجل - استخدام البيانات من auth");
+          setFullName(user.user_metadata?.full_name || "");
+        } else {
+          // خطأ آخر - اعرضه في الكونسول
+          console.error("خطأ في تحميل الملف الشخصي:", error);
+          setFullName(user.user_metadata?.full_name || "");
+        }
+      } else if (data) {
+        // تم جلب البيانات بنجاح
         setFullName(data.full_name || "");
         setPhone(data.phone || "");
         setAddress(data.address || "");
         setCity(data.city || "");
       } else {
-        // إذا لم يكن هناك profile، استخدم البيانات من auth
+        // لا يوجد بيانات - استخدم من auth
         setFullName(user.user_metadata?.full_name || "");
       }
     } catch (error: any) {
@@ -83,11 +91,18 @@ export default function ProfilePage() {
           city: city,
         });
 
-      if (error) throw error;
-
-      setMessage("✅ تم تحديث الملف الشخصي بنجاح");
+      if (error) {
+        // التحقق من نوع الخطأ
+        if (error.code === "42P01" || error.message?.includes("relation") || error.message?.includes("does not exist")) {
+          setMessage("❌ جدول profiles غير موجود. يرجى تشغيل ملف create-profiles-table.sql في Supabase أولاً");
+        } else {
+          throw error;
+        }
+      } else {
+        setMessage("✅ تم تحديث الملف الشخصي بنجاح");
+      }
     } catch (error: any) {
-      setMessage("❌ حدث خطأ: " + error.message);
+      setMessage("❌ حدث خطأ: " + (error.message || "خطأ غير معروف"));
     } finally {
       setUpdating(false);
     }
