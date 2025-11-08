@@ -11,19 +11,58 @@ export default function ProfilePage() {
   const router = useRouter();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
   const [updating, setUpdating] = useState(false);
   const [message, setMessage] = useState("");
+  const [profileLoading, setProfileLoading] = useState(true);
 
   useEffect(() => {
     if (!loading && !user) {
       router.push("/login");
+      return;
     }
 
     if (user) {
-      setFullName(user.user_metadata?.full_name || "");
       setEmail(user.email || "");
+      loadProfile();
     }
   }, [user, loading, router]);
+
+  const loadProfile = async () => {
+    if (!user) return;
+
+    try {
+      setProfileLoading(true);
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+      if (error && error.code !== "PGRST116") {
+        // PGRST116 = لا يوجد سجل
+        throw error;
+      }
+
+      if (data) {
+        setFullName(data.full_name || "");
+        setPhone(data.phone || "");
+        setAddress(data.address || "");
+        setCity(data.city || "");
+      } else {
+        // إذا لم يكن هناك profile، استخدم البيانات من auth
+        setFullName(user.user_metadata?.full_name || "");
+      }
+    } catch (error: any) {
+      console.error("خطأ في تحميل الملف الشخصي:", error);
+      // في حالة الخطأ، استخدم البيانات من auth
+      setFullName(user.user_metadata?.full_name || "");
+    } finally {
+      setProfileLoading(false);
+    }
+  };
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,11 +70,18 @@ export default function ProfilePage() {
     setMessage("");
 
     try {
-      const { error } = await supabase.auth.updateUser({
-        data: {
+      if (!user) throw new Error("لا يوجد مستخدم مسجل");
+
+      // حفظ البيانات في جدول profiles
+      const { error } = await supabase
+        .from("profiles")
+        .upsert({
+          id: user.id,
           full_name: fullName,
-        },
-      });
+          phone: phone,
+          address: address,
+          city: city,
+        });
 
       if (error) throw error;
 
@@ -47,7 +93,7 @@ export default function ProfilePage() {
     }
   };
 
-  if (loading) {
+  if (loading || profileLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -77,7 +123,7 @@ export default function ProfilePage() {
                 <span className="text-4xl">👤</span>
               </div>
               <h2 className="text-xl font-bold text-gray-900">
-                {user.user_metadata?.full_name || "مستخدم"}
+                {fullName || "مستخدم"}
               </h2>
               <p className="text-sm text-gray-500">{user.email}</p>
             </div>
@@ -140,6 +186,7 @@ export default function ProfilePage() {
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="أدخل اسمك الكامل"
                   />
                 </div>
 
@@ -156,6 +203,45 @@ export default function ProfilePage() {
                   <p className="mt-1 text-xs text-gray-500">
                     لا يمكن تغيير البريد الإلكتروني
                   </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    رقم الهاتف
+                  </label>
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="+20 123 456 7890"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    العنوان
+                  </label>
+                  <input
+                    type="text"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="الشارع، رقم المنزل، الحي"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    المدينة
+                  </label>
+                  <input
+                    type="text"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="القاهرة، الإسكندرية، إلخ"
+                  />
                 </div>
 
                 <button
