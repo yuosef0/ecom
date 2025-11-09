@@ -344,7 +344,7 @@ export default function AdminSliderPage() {
             {(previewUrl || imageUrl) && (
               <div>
                 <label className="block text-gray-700 mb-2">معاينة الصورة:</label>
-                <div className="relative w-full aspect-[4/3] sm:aspect-[16/9] lg:aspect-[21/9] bg-gray-100 rounded-lg overflow-hidden">
+                <div className="relative w-full aspect-[16/9] sm:aspect-[21/9] lg:aspect-[3/1] bg-gray-100 rounded-lg overflow-hidden">
                   <img
                     src={previewUrl || imageUrl}
                     alt="Preview"
