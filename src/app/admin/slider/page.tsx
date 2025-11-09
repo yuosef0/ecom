@@ -344,7 +344,7 @@ export default function AdminSliderPage() {
             {(previewUrl || imageUrl) && (
               <div>
                 <label className="block text-gray-700 mb-2 font-semibold">معاينة السلايدر:</label>
-                <div className="relative mx-auto bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-200 shadow-lg" style={{ width: '300px', height: '300px' }}>
+                <div className="relative mx-auto bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-200 shadow-lg" style={{ width: '600px', height: '400px', maxWidth: '100%' }}>
                   {/* Full Width Image Preview */}
                   <div className="relative w-full h-full bg-gray-200">
                     <img
