@@ -344,15 +344,15 @@ export default function AdminSliderPage() {
             {(previewUrl || imageUrl || title || description) && (
               <div>
                 <label className="block text-gray-700 mb-2 font-semibold">معاينة السلايدر:</label>
-                <div className="relative w-full aspect-[2/1] bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-200">
+                <div className="relative w-full aspect-[5/2] bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-200 shadow-lg">
                   <div className="grid grid-cols-2 h-full">
                     {/* Left Side - Text Preview */}
-                    <div className="bg-black flex flex-col justify-center items-start px-8 py-6 text-white">
-                      <p className="text-xs font-medium mb-1 opacity-80">تشكيل</p>
-                      <h2 className="text-2xl font-bold mb-2 leading-tight">
+                    <div className="bg-black flex flex-col justify-center items-start px-10 py-6 text-white">
+                      <p className="text-xs font-medium mb-1 opacity-70">تشكيل</p>
+                      <h2 className="text-2xl md:text-3xl font-bold mb-2 leading-tight">
                         {title || "عنوان الصورة"}
                       </h2>
-                      <p className="text-lg font-medium opacity-90">
+                      <p className="text-base md:text-lg font-normal opacity-80">
                         {description || "الوصف سيظهر هنا"}
                       </p>
                     </div>

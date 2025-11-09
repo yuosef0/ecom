@@ -389,8 +389,8 @@ export default function Home() {
 
       {/* Slider Section */}
       {sliderImages.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 py-6">
-          <div className="relative overflow-hidden rounded-2xl shadow-2xl aspect-[2/1]">
+        <section className="max-w-6xl mx-auto px-4 py-4">
+          <div className="relative overflow-hidden rounded-lg shadow-xl aspect-[5/2]">
             {/* Slides */}
             <div className="relative w-full h-full">
               {sliderImages.map((image, index) => (
@@ -402,17 +402,17 @@ export default function Home() {
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 h-full">
                     {/* Left Side - Text Content */}
-                    <div className="bg-black flex flex-col justify-center items-start px-12 py-8 text-white">
+                    <div className="bg-black flex flex-col justify-center items-start px-8 md:px-16 py-6 text-white">
                       {image.title && (
                         <>
-                          <p className="text-sm font-medium mb-2 opacity-80">تشكيل</p>
-                          <h2 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
+                          <p className="text-xs md:text-sm font-medium mb-1 opacity-70">تشكيل</p>
+                          <h2 className="text-2xl md:text-4xl font-bold mb-2 md:mb-3 leading-tight">
                             {image.title}
                           </h2>
                         </>
                       )}
                       {image.description && (
-                        <p className="text-xl md:text-2xl font-medium opacity-90">
+                        <p className="text-base md:text-xl font-normal opacity-80">
                           {image.description}
                         </p>
                       )}
@@ -435,27 +435,27 @@ export default function Home() {
             </div>
 
             {/* Navigation Arrows & Controls */}
-            <div className="absolute inset-x-0 bottom-6 flex items-center justify-center gap-4">
+            <div className="absolute inset-x-0 bottom-3 flex items-center justify-center gap-2">
               {/* Previous Button */}
               <button
                 onClick={() => setCurrentSlide((prev) => (prev === 0 ? sliderImages.length - 1 : prev - 1))}
-                className="w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white transition flex items-center justify-center shadow-lg"
+                className="w-8 h-8 rounded bg-white/80 hover:bg-white transition flex items-center justify-center shadow border border-gray-200"
               >
-                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
 
               {/* Dots Indicator */}
-              <div className="flex gap-2 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg">
+              <div className="flex gap-1.5 px-2">
                 {sliderImages.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => setCurrentSlide(index)}
-                    className={`transition-all ${
+                    className={`rounded-full transition-all ${
                       index === currentSlide
-                        ? "w-8 h-2 bg-red-600 rounded-full"
-                        : "w-2 h-2 bg-gray-400 rounded-full hover:bg-gray-600"
+                        ? "w-6 h-1.5 bg-gray-800"
+                        : "w-1.5 h-1.5 bg-gray-400 hover:bg-gray-600"
                     }`}
                   />
                 ))}
@@ -464,29 +464,29 @@ export default function Home() {
               {/* Next Button */}
               <button
                 onClick={() => setCurrentSlide((prev) => (prev + 1) % sliderImages.length)}
-                className="w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white transition flex items-center justify-center shadow-lg"
+                className="w-8 h-8 rounded bg-white/80 hover:bg-white transition flex items-center justify-center shadow border border-gray-200"
               >
-                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </button>
-            </div>
 
-            {/* Play/Pause Button - Top Right */}
-            <button
-              onClick={() => setIsSliderPaused(!isSliderPaused)}
-              className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white transition flex items-center justify-center shadow-lg"
-            >
-              {isSliderPaused ? (
-                <svg className="w-5 h-5 text-gray-700" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              ) : (
-                <svg className="w-5 h-5 text-gray-700" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
-                </svg>
-              )}
-            </button>
+              {/* Play/Pause Button */}
+              <button
+                onClick={() => setIsSliderPaused(!isSliderPaused)}
+                className="w-8 h-8 rounded bg-white/80 hover:bg-white transition flex items-center justify-center shadow border border-gray-200 ml-1"
+              >
+                {isSliderPaused ? (
+                  <svg className="w-3.5 h-3.5 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                ) : (
+                  <svg className="w-3.5 h-3.5 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
+                  </svg>
+                )}
+              </button>
+            </div>
           </div>
         </section>
       )}
