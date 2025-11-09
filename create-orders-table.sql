@@ -1,5 +1,8 @@
+-- حذف الجدول القديم إذا كان موجوداً
+DROP TABLE IF EXISTS orders CASCADE;
+
 -- إنشاء جدول الطلبات
-CREATE TABLE IF NOT EXISTS orders (
+CREATE TABLE orders (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
 
