@@ -474,7 +474,7 @@ export default function Home() {
 
       {/* Products by Category */}
       <section className="py-12">
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="max-w-4xl mx-auto px-4">
           {filteredProductsByCategory.length === 0 ? (
             <div className="text-center py-20">
               <p className="text-gray-500 text-lg mb-4">
@@ -503,8 +503,7 @@ export default function Home() {
                   </div>
 
                   {/* Products Grid */}
-                  <div className="flex justify-center">
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                   {categoryProducts.map((product) => {
                     const productImage = product.images && product.images.length > 0
                       ? product.images[0]
@@ -590,7 +589,6 @@ export default function Home() {
                       </div>
                     );
                   })}
-                    </div>
                   </div>
                 </div>
               ))}
