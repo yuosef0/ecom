@@ -503,7 +503,8 @@ export default function Home() {
                   </div>
 
                   {/* Products Grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                  <div className="flex justify-center">
+                    <div className="inline-grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {categoryProducts.map((product) => {
                     const productImage = product.images && product.images.length > 0
                       ? product.images[0]
@@ -589,6 +590,7 @@ export default function Home() {
                       </div>
                     );
                   })}
+                    </div>
                   </div>
                 </div>
               ))}
