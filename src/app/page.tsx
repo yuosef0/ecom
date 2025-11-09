@@ -389,8 +389,8 @@ export default function Home() {
 
       {/* Slider Section */}
       {sliderImages.length > 0 && (
-        <section className="max-w-5xl mx-auto px-4 py-8">
-          <div className="relative overflow-hidden rounded-2xl shadow-2xl aspect-square">
+        <section className="max-w-7xl mx-auto px-4 py-8">
+          <div className="relative overflow-hidden rounded-2xl shadow-2xl aspect-[4/3] sm:aspect-[16/9] lg:aspect-[21/9]">
             {/* Slides */}
             <div className="relative w-full h-full bg-gray-200">
               {sliderImages.map((image, index) => (
