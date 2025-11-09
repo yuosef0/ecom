@@ -32,6 +32,15 @@ interface Product {
   category?: Category;
 }
 
+interface SliderImage {
+  id: string;
+  image_url: string;
+  title: string | null;
+  description: string | null;
+  display_order: number;
+  is_active: boolean;
+}
+
 // جمل متغيرة للبانر العلوي
 const rotatingMessages = [
   "شحن مجاني للطلبات فوق 500 جنيه",
@@ -40,20 +49,14 @@ const rotatingMessages = [
   "منتجات أصلية 100% بأفضل الأسعار",
 ];
 
-// صور السلايدر
-const sliderImages = [
-  "/slider1.jpg",
-  "/slider2.jpg",
-  "/slider3.jpg",
-];
-
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [sliderImages, setSliderImages] = useState<SliderImage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const { addToCart, cart } = useCart();
-  const { user } = useAuth();
+  const { user, signOut, isAdmin } = useAuth();
   const [addedProducts, setAddedProducts] = useState<Set<string>>(new Set());
 
   // حالة الرسالة المتغيرة
@@ -67,6 +70,9 @@ export default function Home() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
+  // حالة قائمة المستخدم المنسدلة
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
+
   // تغيير الرسالة كل 3 ثوانٍ
   useEffect(() => {
     const interval = setInterval(() => {
@@ -77,13 +83,13 @@ export default function Home() {
 
   // تغيير الصور كل 2 ثانية
   useEffect(() => {
-    if (!isSliderPaused) {
+    if (!isSliderPaused && sliderImages.length > 0) {
       const interval = setInterval(() => {
         setCurrentSlide((prev) => (prev + 1) % sliderImages.length);
       }, 2000);
       return () => clearInterval(interval);
     }
-  }, [isSliderPaused]);
+  }, [isSliderPaused, sliderImages.length]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -115,6 +121,19 @@ export default function Home() {
 
         if (productsError) throw productsError;
         setProducts(productsData || []);
+
+        // جلب صور السلايدر
+        const { data: sliderData, error: sliderError } = await supabase
+          .from("slider_images")
+          .select("*")
+          .eq("is_active", true)
+          .order("display_order", { ascending: true });
+
+        if (sliderError) {
+          console.error("Error fetching slider images:", sliderError);
+        } else {
+          setSliderImages(sliderData || []);
+        }
       } catch (err: any) {
         console.error("❌ Error fetching data:", err);
         setError(err.message);
@@ -229,11 +248,66 @@ export default function Home() {
             {/* Right Side - User & Cart */}
             <div className="flex items-center gap-4 justify-start">
               {user ? (
-                <Link href="/profile" className="flex items-center gap-2 hover:text-red-600 transition">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                </Link>
+                <div className="relative">
+                  <button
+                    onClick={() => setShowUserDropdown(!showUserDropdown)}
+                    className="flex items-center gap-2 hover:text-red-600 transition"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </button>
+
+                  {showUserDropdown && (
+                    <>
+                      <div
+                        className="fixed inset-0 z-10"
+                        onClick={() => setShowUserDropdown(false)}
+                      />
+                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border z-20">
+                        <div className="p-4 border-b">
+                          <p className="font-medium text-gray-900 truncate">{user.email}</p>
+                        </div>
+                        <div className="py-2">
+                          <Link
+                            href="/profile"
+                            className="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition"
+                            onClick={() => setShowUserDropdown(false)}
+                          >
+                            📝 حسابي
+                          </Link>
+                          <Link
+                            href="/orders"
+                            className="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition"
+                            onClick={() => setShowUserDropdown(false)}
+                          >
+                            📦 طلباتي
+                          </Link>
+                          {isAdmin && (
+                            <Link
+                              href="/admin"
+                              className="block px-4 py-2 text-blue-600 hover:bg-blue-50 transition font-medium"
+                              onClick={() => setShowUserDropdown(false)}
+                            >
+                              ⚙️ لوحة التحكم
+                            </Link>
+                          )}
+                        </div>
+                        <div className="border-t py-2">
+                          <button
+                            onClick={() => {
+                              signOut();
+                              setShowUserDropdown(false);
+                            }}
+                            className="block w-full text-right px-4 py-2 text-red-600 hover:bg-red-50 transition"
+                          >
+                            🚪 تسجيل الخروج
+                          </button>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
               ) : (
                 <Link href="/login" className="flex items-center gap-2 hover:text-red-600 transition">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -314,53 +388,54 @@ export default function Home() {
       </header>
 
       {/* Slider Section */}
-      <section className="max-w-5xl mx-auto px-4 py-8">
-        <div className="relative overflow-hidden rounded-2xl shadow-2xl">
-          {/* Slides */}
-          <div className="relative h-96 bg-gray-200">
-            {sliderImages.map((image, index) => (
-              <div
-                key={index}
-                className={`absolute inset-0 transition-opacity duration-1000 ${
-                  index === currentSlide ? "opacity-100" : "opacity-0"
-                }`}
-              >
-                <img
-                  src={image}
-                  alt={`Slide ${index + 1}`}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    // في حالة عدم وجود الصورة، عرض placeholder
-                    e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='400'%3E%3Crect fill='%23ddd' width='800' height='400'/%3E%3Ctext fill='%23999' font-family='sans-serif' font-size='40' dy='10.5' font-weight='bold' x='50%25' y='50%25' text-anchor='middle'%3ESlide " + (index + 1) + "%3C/text%3E%3C/svg%3E";
-                  }}
-                />
-              </div>
-            ))}
-          </div>
-
-          {/* Controls */}
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center gap-4 bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full shadow-lg">
-            <button
-              onClick={() => setIsSliderPaused(!isSliderPaused)}
-              className="text-gray-700 hover:text-red-600 transition font-medium"
-            >
-              {isSliderPaused ? "▶️ تشغيل" : "⏸️ إيقاف"}
-            </button>
-
-            <div className="flex gap-2">
-              {sliderImages.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentSlide(index)}
-                  className={`w-2 h-2 rounded-full transition ${
-                    index === currentSlide ? "bg-red-600 w-8" : "bg-gray-400"
+      {sliderImages.length > 0 && (
+        <section className="max-w-5xl mx-auto px-4 py-8">
+          <div className="relative overflow-hidden rounded-2xl shadow-2xl aspect-square">
+            {/* Slides */}
+            <div className="relative w-full h-full bg-gray-200">
+              {sliderImages.map((image, index) => (
+                <div
+                  key={image.id}
+                  className={`absolute inset-0 transition-opacity duration-1000 ${
+                    index === currentSlide ? "opacity-100" : "opacity-0"
                   }`}
-                />
+                >
+                  <img
+                    src={image.image_url}
+                    alt={image.title || `Slide ${index + 1}`}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='800'%3E%3Crect fill='%23ddd' width='800' height='800'/%3E%3Ctext fill='%23999' font-family='sans-serif' font-size='40' dy='10.5' font-weight='bold' x='50%25' y='50%25' text-anchor='middle'%3E" + (image.title || "صورة السلايدر") + "%3C/text%3E%3C/svg%3E";
+                    }}
+                  />
+                </div>
               ))}
             </div>
+
+            {/* Controls */}
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center gap-4 bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full shadow-lg">
+              <button
+                onClick={() => setIsSliderPaused(!isSliderPaused)}
+                className="text-gray-700 hover:text-red-600 transition font-medium"
+              >
+                {isSliderPaused ? "▶️ تشغيل" : "⏸️ إيقاف"}
+              </button>
+
+              <div className="flex gap-2">
+                {sliderImages.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentSlide(index)}
+                    className={`w-2 h-2 rounded-full transition ${
+                      index === currentSlide ? "bg-red-600 w-8" : "bg-gray-400"
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Products by Category */}
       <section className="max-w-7xl mx-auto px-4 py-12">
