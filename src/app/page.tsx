@@ -438,36 +438,37 @@ export default function Home() {
       )}
 
       {/* Products by Category */}
-      <section className="max-w-7xl mx-auto px-4 py-12">
-        {filteredProductsByCategory.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="text-gray-500 text-lg mb-4">
-              {searchQuery ? "لا توجد نتائج للبحث" : "لا توجد منتجات حالياً"}
-            </p>
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                className="text-red-600 hover:underline"
-              >
-                مسح البحث
-              </button>
-            )}
-          </div>
-        ) : (
-          <div className="space-y-16">
-            {filteredProductsByCategory.map(({ category, products: categoryProducts }) => (
-              <div key={category.id}>
-                {/* Category Title */}
-                <div className="mb-8">
-                  <h2 className="text-3xl font-bold text-gray-800 mb-2">{category.name}</h2>
-                  {category.description && (
-                    <p className="text-gray-600">{category.description}</p>
-                  )}
-                  <div className="h-1 w-24 bg-red-600 mt-3"></div>
-                </div>
+      <section className="py-12">
+        <div className="max-w-6xl mx-auto px-4">
+          {filteredProductsByCategory.length === 0 ? (
+            <div className="text-center py-20">
+              <p className="text-gray-500 text-lg mb-4">
+                {searchQuery ? "لا توجد نتائج للبحث" : "لا توجد منتجات حالياً"}
+              </p>
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="text-red-600 hover:underline"
+                >
+                  مسح البحث
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-16">
+              {filteredProductsByCategory.map(({ category, products: categoryProducts }) => (
+                <div key={category.id}>
+                  {/* Category Title */}
+                  <div className="mb-8 text-center">
+                    <h2 className="text-3xl font-bold text-gray-800 mb-2">{category.name}</h2>
+                    {category.description && (
+                      <p className="text-gray-600">{category.description}</p>
+                    )}
+                    <div className="h-1 w-24 bg-red-600 mt-3 mx-auto"></div>
+                  </div>
 
-                {/* Products Grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                  {/* Products Grid */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
                   {categoryProducts.map((product) => {
                     const productImage = product.images && product.images.length > 0
                       ? product.images[0]

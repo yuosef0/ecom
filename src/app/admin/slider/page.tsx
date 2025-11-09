@@ -30,6 +30,9 @@ export default function AdminSliderPage() {
   const [displayOrder, setDisplayOrder] = useState(1);
   const [isActive, setIsActive] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string>("");
 
   useEffect(() => {
     if (!user) {
@@ -61,18 +64,67 @@ export default function AdminSliderPage() {
     }
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      // إنشاء معاينة للصورة
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const uploadImage = async (file: File): Promise<string> => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+    const filePath = `slider/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('product-images')
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
+
+    if (uploadError) throw uploadError;
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('product-images')
+      .getPublicUrl(filePath);
+
+    return publicUrl;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     setMessage("");
 
     try {
+      let finalImageUrl = imageUrl;
+
+      // إذا كان هناك ملف جديد، قم برفعه
+      if (imageFile) {
+        setUploading(true);
+        finalImageUrl = await uploadImage(imageFile);
+        setUploading(false);
+      }
+
+      if (!finalImageUrl) {
+        setMessage("❌ يجب اختيار صورة أو إدخال رابط");
+        setSaving(false);
+        return;
+      }
+
       if (editingId) {
         // تحديث صورة موجودة
         const { error } = await supabase
           .from("slider_images")
           .update({
-            image_url: imageUrl,
+            image_url: finalImageUrl,
             title: title || null,
             description: description || null,
             display_order: displayOrder,
@@ -86,7 +138,7 @@ export default function AdminSliderPage() {
         // إضافة صورة جديدة
         const { error } = await supabase.from("slider_images").insert([
           {
-            image_url: imageUrl,
+            image_url: finalImageUrl,
             title: title || null,
             description: description || null,
             display_order: displayOrder,
@@ -106,6 +158,7 @@ export default function AdminSliderPage() {
       setMessage("❌ خطأ في حفظ الصورة: " + error.message);
     } finally {
       setSaving(false);
+      setUploading(false);
     }
   };
 
@@ -144,6 +197,8 @@ export default function AdminSliderPage() {
     setDescription("");
     setDisplayOrder(images.length + 1);
     setIsActive(true);
+    setImageFile(null);
+    setPreviewUrl("");
   };
 
   if (loading) {
@@ -187,8 +242,32 @@ export default function AdminSliderPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
+              <label className="block text-gray-700 mb-2 font-semibold">
+                رفع صورة من الجهاز
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+              />
+              <p className="text-sm text-gray-500 mt-1">
+                اختر صورة من جهازك (JPG, PNG, GIF)
+              </p>
+            </div>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">أو</span>
+              </div>
+            </div>
+
+            <div>
               <label className="block text-gray-700 mb-2">
-                رابط الصورة <span className="text-red-600">*</span>
+                رابط الصورة
               </label>
               <input
                 type="url"
@@ -196,10 +275,10 @@ export default function AdminSliderPage() {
                 onChange={(e) => setImageUrl(e.target.value)}
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
                 placeholder="https://example.com/image.jpg"
-                required
+                disabled={!!imageFile}
               />
               <p className="text-sm text-gray-500 mt-1">
-                يمكنك رفع الصورة على خدمة مثل Imgur أو Cloudinary ونسخ الرابط
+                أو ضع رابط صورة من الإنترنت
               </p>
             </div>
 
@@ -251,17 +330,17 @@ export default function AdminSliderPage() {
             </div>
 
             {/* معاينة الصورة */}
-            {imageUrl && (
+            {(previewUrl || imageUrl) && (
               <div>
                 <label className="block text-gray-700 mb-2">معاينة الصورة:</label>
-                <div className="relative w-full h-64 bg-gray-100 rounded-lg overflow-hidden">
+                <div className="relative w-full aspect-square bg-gray-100 rounded-lg overflow-hidden">
                   <img
-                    src={imageUrl}
+                    src={previewUrl || imageUrl}
                     alt="Preview"
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       e.currentTarget.src =
-                        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23ddd' width='400' height='300'/%3E%3Ctext fill='%23999' font-family='sans-serif' font-size='20' dy='10.5' font-weight='bold' x='50%25' y='50%25' text-anchor='middle'%3Eخطأ في تحميل الصورة%3C/text%3E%3C/svg%3E";
+                        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect fill='%23ddd' width='400' height='400'/%3E%3Ctext fill='%23999' font-family='sans-serif' font-size='20' dy='10.5' font-weight='bold' x='50%25' y='50%25' text-anchor='middle'%3Eخطأ في تحميل الصورة%3C/text%3E%3C/svg%3E";
                     }}
                   />
                 </div>
@@ -271,10 +350,16 @@ export default function AdminSliderPage() {
             <div className="flex gap-3">
               <button
                 type="submit"
-                disabled={saving}
+                disabled={saving || uploading}
                 className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 disabled:opacity-50"
               >
-                {saving ? "جاري الحفظ..." : editingId ? "تحديث" : "إضافة"}
+                {uploading
+                  ? "جاري رفع الصورة..."
+                  : saving
+                  ? "جاري الحفظ..."
+                  : editingId
+                  ? "تحديث"
+                  : "إضافة"}
               </button>
 
               {editingId && (
