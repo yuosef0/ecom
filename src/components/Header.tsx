@@ -3,12 +3,14 @@
 import Link from "next/link";
 import { useAuth } from "../contexts/AuthContext";
 import { useCart } from "../contexts/CartContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "../lib/supabaseClient";
 
 export default function Header() {
   const { user, signOut, isAdmin } = useAuth();
   const { cart } = useCart();
   const [showDropdown, setShowDropdown] = useState(false);
+  const [profileName, setProfileName] = useState<string>("");
 
   const handleSignOut = async () => {
     await signOut();
@@ -17,8 +19,34 @@ export default function Header() {
 
   const cartItemsCount = cart.reduce((total, item) => total + item.quantity, 0);
 
-  // الحصول على الاسم من بيانات المستخدم
-  const userName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "مستخدم";
+  // جلب الاسم من جدول profiles
+  useEffect(() => {
+    const loadProfileName = async () => {
+      if (!user) {
+        setProfileName("");
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", user.id)
+          .single();
+
+        if (data && !error) {
+          setProfileName(data.full_name || "");
+        }
+      } catch (error) {
+        // في حالة الخطأ، لا نفعل شيء
+      }
+    };
+
+    loadProfileName();
+  }, [user]);
+
+  // الحصول على الاسم من بيانات المستخدم (مع الأولوية للاسم من profiles)
+  const userName = profileName || user?.user_metadata?.full_name || user?.email?.split("@")[0] || "مستخدم";
 
   return (
     <header className="bg-white shadow-sm border-b sticky top-0 z-50">
