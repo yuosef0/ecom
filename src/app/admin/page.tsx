@@ -178,7 +178,7 @@ export default function AdminDashboard() {
             )}
 
             {/* الروابط السريعة */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               <Link
                 href="/admin/products"
                 className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition group"
@@ -208,6 +208,23 @@ export default function AdminDashboard() {
                     </h3>
                     <p className="text-sm text-gray-600">
                       متابعة وتحديث حالة الطلبات
+                    </p>
+                  </div>
+                </div>
+              </Link>
+
+              <Link
+                href="/admin/slider"
+                className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition group"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="text-4xl">🖼️</div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 group-hover:text-blue-600">
+                      إدارة السلايدر
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      إضافة وتعديل صور السلايدر
                     </p>
                   </div>
                 </div>
