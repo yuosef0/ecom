@@ -341,20 +341,50 @@ export default function AdminSliderPage() {
             </div>
 
             {/* معاينة الصورة */}
-            {(previewUrl || imageUrl) && (
+            {(previewUrl || imageUrl || title || description) && (
               <div>
-                <label className="block text-gray-700 mb-2">معاينة الصورة:</label>
-                <div className="relative w-full aspect-[16/9] sm:aspect-[21/9] lg:aspect-[3/1] bg-gray-100 rounded-lg overflow-hidden">
-                  <img
-                    src={previewUrl || imageUrl}
-                    alt="Preview"
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.src =
-                        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect fill='%23ddd' width='400' height='400'/%3E%3Ctext fill='%23999' font-family='sans-serif' font-size='20' dy='10.5' font-weight='bold' x='50%25' y='50%25' text-anchor='middle'%3Eخطأ في تحميل الصورة%3C/text%3E%3C/svg%3E";
-                    }}
-                  />
+                <label className="block text-gray-700 mb-2 font-semibold">معاينة السلايدر:</label>
+                <div className="relative w-full aspect-[2/1] bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-200">
+                  <div className="grid grid-cols-2 h-full">
+                    {/* Left Side - Text Preview */}
+                    <div className="bg-black flex flex-col justify-center items-start px-8 py-6 text-white">
+                      <p className="text-xs font-medium mb-1 opacity-80">تشكيل</p>
+                      <h2 className="text-2xl font-bold mb-2 leading-tight">
+                        {title || "عنوان الصورة"}
+                      </h2>
+                      <p className="text-lg font-medium opacity-90">
+                        {description || "الوصف سيظهر هنا"}
+                      </p>
+                    </div>
+
+                    {/* Right Side - Image Preview */}
+                    <div className="relative bg-gray-200">
+                      {(previewUrl || imageUrl) ? (
+                        <img
+                          src={previewUrl || imageUrl}
+                          alt="Preview"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src =
+                              "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200'%3E%3Crect fill='%23ddd' width='400' height='200'/%3E%3Ctext fill='%23999' font-family='sans-serif' font-size='20' dy='10.5' font-weight='bold' x='50%25' y='50%25' text-anchor='middle'%3Eخطأ في تحميل الصورة%3C/text%3E%3C/svg%3E";
+                          }}
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                          <div className="text-center">
+                            <svg className="w-16 h-16 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <p className="text-sm">ارفع صورة أو أدخل رابط</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  💡 ستظهر الصورة على اليمين والنص على اليسار في الصفحة الرئيسية
+                </p>
               </div>
             )}
 
