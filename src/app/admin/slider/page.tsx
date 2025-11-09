@@ -58,7 +58,8 @@ export default function AdminSliderPage() {
       setImages(data || []);
     } catch (error: any) {
       console.error("Error fetching slider images:", error);
-      setMessage("❌ خطأ في تحميل الصور: " + error.message);
+      const errorMsg = error?.message || error?.error_description || JSON.stringify(error) || "خطأ غير معروف";
+      setMessage("❌ خطأ في تحميل الصور: " + errorMsg);
     } finally {
       setLoading(false);
     }
@@ -78,24 +79,32 @@ export default function AdminSliderPage() {
   };
 
   const uploadImage = async (file: File): Promise<string> => {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
-    const filePath = `slider/${fileName}`;
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+      const filePath = `slider/${fileName}`;
 
-    const { error: uploadError } = await supabase.storage
-      .from('product-images')
-      .upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: false
-      });
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('product-images')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
 
-    if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error("Upload error details:", uploadError);
+        throw new Error(uploadError.message || "فشل رفع الصورة");
+      }
 
-    const { data: { publicUrl } } = supabase.storage
-      .from('product-images')
-      .getPublicUrl(filePath);
+      const { data: { publicUrl } } = supabase.storage
+        .from('product-images')
+        .getPublicUrl(filePath);
 
-    return publicUrl;
+      return publicUrl;
+    } catch (error: any) {
+      console.error("Error in uploadImage:", error);
+      throw error;
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -155,7 +164,8 @@ export default function AdminSliderPage() {
       fetchSliderImages();
     } catch (error: any) {
       console.error("Error saving slider image:", error);
-      setMessage("❌ خطأ في حفظ الصورة: " + error.message);
+      const errorMsg = error?.message || error?.error_description || error?.hint || JSON.stringify(error) || "خطأ غير معروف";
+      setMessage("❌ خطأ في حفظ الصورة: " + errorMsg);
     } finally {
       setSaving(false);
       setUploading(false);
@@ -186,7 +196,8 @@ export default function AdminSliderPage() {
       fetchSliderImages();
     } catch (error: any) {
       console.error("Error deleting slider image:", error);
-      setMessage("❌ خطأ في حذف الصورة: " + error.message);
+      const errorMsg = error?.message || error?.error_description || JSON.stringify(error) || "خطأ غير معروف";
+      setMessage("❌ خطأ في حذف الصورة: " + errorMsg);
     }
   };
 
