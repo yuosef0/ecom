@@ -448,7 +448,6 @@ export default function Home() {
                 {isSliderPaused ? "▶" : "⏸"}
               </button>
             </div>
-          </div>
         </section>
       )}
 
