@@ -400,35 +400,16 @@ export default function Home() {
                     index === currentSlide ? "opacity-100" : "opacity-0"
                   }`}
                 >
-                  <div className="grid grid-cols-1 md:grid-cols-2 h-full">
-                    {/* Left Side - Text Content */}
-                    <div className="bg-black flex flex-col justify-center items-start px-8 md:px-16 py-6 text-white">
-                      {image.title && (
-                        <>
-                          <p className="text-xs md:text-sm font-medium mb-1 opacity-70">تشكيل</p>
-                          <h2 className="text-2xl md:text-4xl font-bold mb-2 md:mb-3 leading-tight">
-                            {image.title}
-                          </h2>
-                        </>
-                      )}
-                      {image.description && (
-                        <p className="text-base md:text-xl font-normal opacity-80">
-                          {image.description}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Right Side - Image */}
-                    <div className="relative bg-gray-200">
-                      <img
-                        src={image.image_url}
-                        alt={image.title || `Slide ${index + 1}`}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='400'%3E%3Crect fill='%23ddd' width='800' height='400'/%3E%3Ctext fill='%23999' font-family='sans-serif' font-size='40' dy='10.5' font-weight='bold' x='50%25' y='50%25' text-anchor='middle'%3E" + (image.title || "صورة السلايدر") + "%3C/text%3E%3C/svg%3E";
-                        }}
-                      />
-                    </div>
+                  {/* Full Width Image */}
+                  <div className="relative w-full h-full bg-gray-200">
+                    <img
+                      src={image.image_url}
+                      alt={image.title || `Slide ${index + 1}`}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='400'%3E%3Crect fill='%23ddd' width='800' height='400'/%3E%3Ctext fill='%23999' font-family='sans-serif' font-size='40' dy='10.5' font-weight='bold' x='50%25' y='50%25' text-anchor='middle'%3E" + (image.title || "صورة السلايدر") + "%3C/text%3E%3C/svg%3E";
+                      }}
+                    />
                   </div>
                 </div>
               ))}
