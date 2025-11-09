@@ -2,7 +2,6 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-
 interface CartItem {
   id: string;
   cartItemId: string; // معرف فريد للعنصر في السلة (product_id + size + color)
