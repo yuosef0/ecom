@@ -75,35 +75,58 @@ export default function AdminSidebar() {
   ];
 
   return (
-    <aside className="flex w-64 flex-col bg-[#231010] p-4 text-white min-h-screen">
-      <div className="flex flex-col gap-4">
-        {/* Admin Info */}
-        <div className="flex items-center gap-3 p-2">
-          <div className="w-10 h-10 bg-[#e60000]/20 rounded-full flex items-center justify-center">
-            <svg className="w-6 h-6 text-[#e60000]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
+    <aside className="w-64 flex-shrink-0 bg-white dark:bg-[#182635] border-l border-slate-200 dark:border-slate-800">
+      <div className="flex h-full flex-col justify-between p-4">
+        <div className="flex flex-col gap-4">
+          {/* Admin Info */}
+          <div className="flex gap-3 items-center p-2">
+            <div className="w-10 h-10 bg-[#137fec]/10 dark:bg-[#137fec]/20 rounded-full flex items-center justify-center">
+              <svg className="w-6 h-6 text-[#137fec]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+            <div className="flex flex-col min-w-0">
+              <h1 className="text-slate-900 dark:text-white text-base font-medium leading-normal truncate">
+                {user?.user_metadata?.full_name || "المدير"}
+              </h1>
+              <p className="text-slate-500 dark:text-slate-400 text-sm font-normal leading-normal">مدير</p>
+            </div>
           </div>
-          <div className="flex flex-col min-w-0">
-            <h1 className="text-white text-base font-medium leading-normal truncate">
-              {user?.user_metadata?.full_name || "المدير"}
-            </h1>
-            <p className="text-[#cc8e8e] text-sm font-normal leading-normal">مدير</p>
-          </div>
+
+          {/* Navigation */}
+          <nav className="flex flex-col gap-2 mt-4">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+                    isActive
+                      ? "bg-[#137fec]/10 dark:bg-[#137fec]/20 text-[#137fec]"
+                      : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                  }`}
+                >
+                  {item.icon}
+                  <p className="text-sm font-medium leading-normal">{item.name}</p>
+                </Link>
+              );
+            })}
+          </nav>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex flex-col gap-2">
-          {navItems.map((item) => {
+        {/* Bottom Navigation */}
+        <div className="flex flex-col gap-1">
+          {bottomNavItems.map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-colors ${
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
                   isActive
-                    ? "bg-[#4a2121] text-white"
-                    : "text-white hover:bg-[#351818]"
+                    ? "bg-[#137fec]/10 dark:bg-[#137fec]/20 text-[#137fec]"
+                    : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
                 }`}
               >
                 {item.icon}
@@ -111,38 +134,17 @@ export default function AdminSidebar() {
               </Link>
             );
           })}
-        </nav>
-      </div>
 
-      {/* Bottom Navigation */}
-      <div className="mt-auto flex flex-col gap-1">
-        {bottomNavItems.map((item) => {
-          const isActive = pathname === item.href;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-                isActive
-                  ? "bg-[#4a2121] text-white"
-                  : "text-white hover:bg-[#351818]"
-              }`}
-            >
-              {item.icon}
-              <p className="text-sm font-medium leading-normal">{item.name}</p>
-            </Link>
-          );
-        })}
-
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-3 px-3 py-2 text-white hover:bg-[#351818] rounded-lg transition-colors"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-          </svg>
-          <p className="text-sm font-medium leading-normal">تسجيل الخروج</p>
-        </button>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            <p className="text-sm font-medium leading-normal">تسجيل الخروج</p>
+          </button>
+        </div>
       </div>
     </aside>
   );

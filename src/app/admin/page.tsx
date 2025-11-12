@@ -112,17 +112,17 @@ export default function AdminDashboard() {
       <div className="mx-auto max-w-7xl">
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#e60000]"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#137fec]"></div>
           </div>
         ) : (
           <>
             {/* Page Heading */}
             <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
               <div className="flex flex-col gap-2">
-                <h1 className="text-4xl font-black leading-tight tracking-tight text-white">
+                <h1 className="text-4xl font-black leading-tight tracking-tight text-slate-900 dark:text-white">
                   لوحة التحكم الرئيسية
                 </h1>
-                <p className="text-base font-normal leading-normal text-[#cc8e8e]">
+                <p className="text-base font-normal leading-normal text-slate-500 dark:text-slate-400">
                   نظرة عامة على أداء متجرك
                 </p>
               </div>
@@ -130,113 +130,113 @@ export default function AdminDashboard() {
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 gap-6 py-6 sm:grid-cols-2 lg:grid-cols-4">
-              <div className="flex flex-col gap-2 rounded-lg border border-[#6a2f2f] p-6">
-                <p className="text-base font-medium leading-normal text-white">
+              <div className="flex flex-col gap-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#182635] p-6">
+                <p className="text-base font-medium leading-normal text-slate-600 dark:text-slate-400">
                   إجمالي الإيرادات
                 </p>
-                <p className="text-2xl font-bold leading-tight tracking-light text-white">
+                <p className="text-2xl font-bold leading-tight tracking-light text-slate-900 dark:text-white">
                   {stats.totalRevenue.toLocaleString("ar-SA")} ر.س
                 </p>
-                <p className="text-base font-medium leading-normal text-[#0bda0b]">
+                <p className="text-base font-medium leading-normal text-green-600 dark:text-green-400">
                   {stats.revenueGrowth}
                 </p>
               </div>
 
-              <div className="flex flex-col gap-2 rounded-lg border border-[#6a2f2f] p-6">
-                <p className="text-base font-medium leading-normal text-white">
+              <div className="flex flex-col gap-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#182635] p-6">
+                <p className="text-base font-medium leading-normal text-slate-600 dark:text-slate-400">
                   إجمالي الطلبات
                 </p>
-                <p className="text-2xl font-bold leading-tight tracking-light text-white">
+                <p className="text-2xl font-bold leading-tight tracking-light text-slate-900 dark:text-white">
                   {stats.totalOrders.toLocaleString("ar-SA")}
                 </p>
-                <p className="text-base font-medium leading-normal text-[#0bda0b]">
+                <p className="text-base font-medium leading-normal text-green-600 dark:text-green-400">
                   {stats.ordersGrowth}
                 </p>
               </div>
 
-              <div className="flex flex-col gap-2 rounded-lg border border-[#6a2f2f] p-6">
-                <p className="text-base font-medium leading-normal text-white">
+              <div className="flex flex-col gap-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#182635] p-6">
+                <p className="text-base font-medium leading-normal text-slate-600 dark:text-slate-400">
                   إجمالي المنتجات
                 </p>
-                <p className="text-2xl font-bold leading-tight tracking-light text-white">
+                <p className="text-2xl font-bold leading-tight tracking-light text-slate-900 dark:text-white">
                   {stats.totalProducts.toLocaleString("ar-SA")}
                 </p>
-                <p className="text-base font-medium leading-normal text-[#0bda0b]">
+                <p className="text-base font-medium leading-normal text-green-600 dark:text-green-400">
                   {stats.productsGrowth}
                 </p>
               </div>
 
-              <div className="flex flex-col gap-2 rounded-lg border border-[#6a2f2f] p-6">
-                <p className="text-base font-medium leading-normal text-white">
+              <div className="flex flex-col gap-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#182635] p-6">
+                <p className="text-base font-medium leading-normal text-slate-600 dark:text-slate-400">
                   الطلبات المعلقة
                 </p>
-                <p className="text-2xl font-bold leading-tight tracking-light text-white">
+                <p className="text-2xl font-bold leading-tight tracking-light text-slate-900 dark:text-white">
                   {stats.pendingOrders.toLocaleString("ar-SA")}
                 </p>
-                <p className="text-base font-medium leading-normal text-[#fa3838]">
+                <p className="text-base font-medium leading-normal text-red-600 dark:text-red-400">
                   {stats.pendingGrowth}
                 </p>
               </div>
             </div>
 
             {/* Recent Orders Section */}
-            <h2 className="px-4 pb-3 pt-5 text-[22px] font-bold leading-tight tracking-tight text-white">
+            <h2 className="px-4 pb-3 pt-5 text-[22px] font-bold leading-tight tracking-tight text-slate-900 dark:text-white">
               آخر الطلبات
             </h2>
 
             {/* Table */}
             <div className="px-4 py-3">
-              <div className="overflow-hidden rounded-lg border border-[#6a2f2f] bg-[#231010]">
+              <div className="overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#182635]">
                 {recentOrders.length === 0 ? (
-                  <div className="p-8 text-center text-[#cc8e8e]">
+                  <div className="p-8 text-center text-slate-500 dark:text-slate-400">
                     لا توجد طلبات حالياً
                   </div>
                 ) : (
                   <table className="w-full text-right">
-                    <thead className="bg-[#351818]">
+                    <thead className="border-b border-slate-200 dark:border-slate-800">
                       <tr>
-                        <th className="px-4 py-3 text-sm font-medium leading-normal text-white">
+                        <th className="px-4 py-3 text-sm font-medium leading-normal text-slate-600 dark:text-slate-400">
                           رقم الطلب
                         </th>
-                        <th className="px-4 py-3 text-sm font-medium leading-normal text-white">
+                        <th className="px-4 py-3 text-sm font-medium leading-normal text-slate-600 dark:text-slate-400">
                           اسم العميل
                         </th>
-                        <th className="px-4 py-3 text-sm font-medium leading-normal text-white">
+                        <th className="px-4 py-3 text-sm font-medium leading-normal text-slate-600 dark:text-slate-400">
                           المبلغ
                         </th>
-                        <th className="px-4 py-3 text-sm font-medium leading-normal text-white">
+                        <th className="px-4 py-3 text-sm font-medium leading-normal text-slate-600 dark:text-slate-400">
                           حالة الطلب
                         </th>
-                        <th className="px-4 py-3 text-sm font-medium leading-normal text-white">
+                        <th className="px-4 py-3 text-sm font-medium leading-normal text-slate-600 dark:text-slate-400">
                           التاريخ
                         </th>
-                        <th className="px-4 py-3 text-sm font-medium leading-normal text-[#cc8e8e]">
+                        <th className="px-4 py-3 text-sm font-medium leading-normal text-slate-600 dark:text-slate-400">
                           إجراءات
                         </th>
                       </tr>
                     </thead>
                     <tbody>
                       {recentOrders.map((order) => (
-                        <tr key={order.id} className="border-t border-t-[#6a2f2f]">
-                          <td className="h-[72px] px-4 py-2 text-sm font-normal leading-normal text-[#cc8e8e]">
+                        <tr key={order.id} className="border-t border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/50">
+                          <td className="h-[72px] px-4 py-2 text-sm font-normal leading-normal text-slate-500 dark:text-slate-400">
                             #{order.id.slice(0, 8)}
                           </td>
-                          <td className="h-[72px] px-4 py-2 text-sm font-normal leading-normal text-white">
+                          <td className="h-[72px] px-4 py-2 text-sm font-normal leading-normal text-slate-900 dark:text-white">
                             {order.profiles?.full_name || order.customer_name || "عميل"}
                           </td>
-                          <td className="h-[72px] px-4 py-2 text-sm font-normal leading-normal text-[#cc8e8e]">
+                          <td className="h-[72px] px-4 py-2 text-sm font-normal leading-normal text-slate-500 dark:text-slate-400">
                             {order.total_amount.toFixed(0)} ر.س
                           </td>
                           <td className="h-[72px] px-4 py-2 text-sm font-normal leading-normal">
                             {getStatusBadge(order.order_status)}
                           </td>
-                          <td className="h-[72px] px-4 py-2 text-sm font-normal leading-normal text-[#cc8e8e]">
+                          <td className="h-[72px] px-4 py-2 text-sm font-normal leading-normal text-slate-500 dark:text-slate-400">
                             {formatDate(order.created_at)}
                           </td>
                           <td className="h-[72px] px-4 py-2">
                             <Link
                               href={`/admin/orders`}
-                              className="text-sm font-bold leading-normal tracking-[0.015em] text-[#cc8e8e] hover:text-white transition-colors"
+                              className="text-sm font-bold leading-normal tracking-[0.015em] text-[#137fec] hover:text-[#137fec]/80 transition-colors"
                             >
                               عرض التفاصيل
                             </Link>
