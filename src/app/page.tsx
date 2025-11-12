@@ -385,7 +385,7 @@ export default function Home() {
                       return (
                         <Link
                           key={product.id}
-                          href={`/products/${product.slug}`}
+                          href={`/products/${product.slug || product.id}`}
                           className="flex flex-col gap-3 pb-3 bg-white dark:bg-[#2d1616] rounded-lg shadow-sm overflow-hidden group hover:shadow-md transition-shadow duration-300"
                         >
                           <div

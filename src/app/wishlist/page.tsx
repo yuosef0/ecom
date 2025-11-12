@@ -128,7 +128,7 @@ export default function WishlistPage() {
             {products.map((product) => (
               <Link
                 key={product.id}
-                href={`/products/${product.slug}`}
+                href={`/products/${product.slug || product.id}`}
                 className="bg-[#f5f5f5] dark:bg-[#2d1616] rounded-lg overflow-hidden border border-[#e5e7eb] dark:border-[#4a4a4a] hover:shadow-lg transition-all hover:scale-105 group"
               >
                 {/* Product Image */}
