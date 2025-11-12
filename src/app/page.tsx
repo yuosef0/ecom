@@ -80,30 +80,6 @@ export default function Home() {
     }
   }, [sliderImages.length]);
 
-  // Scroll animation باستخدام CSS
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("animate-in");
-          }
-        });
-      },
-      {
-        threshold: 0.1,
-        rootMargin: "0px 0px -100px 0px",
-      }
-    );
-
-    const productElements = document.querySelectorAll("[data-animate]");
-    productElements.forEach((el) => observer.observe(el));
-
-    return () => {
-      productElements.forEach((el) => observer.unobserve(el));
-    };
-  }, [products]);
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -474,8 +450,7 @@ export default function Home() {
                         <Link
                           key={product.id}
                           href={`/products/${product.id}`}
-                          data-animate="true"
-                          className="flex flex-col gap-3 pb-3 bg-white dark:bg-[#2d1616] rounded-lg shadow-sm overflow-hidden group"
+                          className="flex flex-col gap-3 pb-3 bg-white dark:bg-[#2d1616] rounded-lg shadow-sm overflow-hidden group hover:shadow-md transition-shadow duration-300"
                         >
                           <div
                             className={`relative w-full bg-center bg-no-repeat aspect-[3/4] bg-cover transition-transform duration-300 group-hover:scale-105 ${
