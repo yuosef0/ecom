@@ -70,9 +70,21 @@ export default function Home() {
   // حالة الفئة المختارة
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  // قراءة الـ category من الـ URL
+  // قراءة الـ category والـ search من الـ URL
   useEffect(() => {
     const categorySlug = searchParams?.get("category");
+    const search = searchParams?.get("search");
+
+    // قراءة الـ search
+    if (search) {
+      setSearchQuery(search);
+      setSearchOpen(true);
+    } else {
+      setSearchQuery("");
+      setSearchOpen(false);
+    }
+
+    // قراءة الـ category
     if (categorySlug && categories.length > 0) {
       // البحث عن الـ category بالـ slug
       const category = categories.find((cat) => cat.slug === categorySlug);
@@ -181,9 +193,14 @@ export default function Home() {
     .map((group) => ({
       ...group,
       products: searchQuery
-        ? group.products.filter((p) =>
-            p.title.toLowerCase().includes(searchQuery.toLowerCase())
-          )
+        ? group.products.filter((p) => {
+            const query = searchQuery.toLowerCase();
+            const title = p.title?.toLowerCase() || "";
+            const description = p.description?.toLowerCase() || "";
+
+            // البحث في العنوان أو الوصف
+            return title.includes(query) || description.includes(query);
+          })
         : group.products,
     }))
     .filter((group) => group.products.length > 0);

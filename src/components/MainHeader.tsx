@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useCart } from "../contexts/CartContext";
 import { useAuth } from "../contexts/AuthContext";
 import { supabase } from "../lib/supabaseClient";
@@ -16,11 +17,68 @@ interface Category {
 export default function MainHeader() {
   const { cart } = useCart();
   const { user, signOut, isAdmin } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [categories, setCategories] = useState<Category[]>([]);
 
   const cartItemsCount = cart.reduce((total, item) => total + item.quantity, 0);
+
+  // قراءة الـ search من الـ URL
+  useEffect(() => {
+    const search = searchParams?.get("search");
+    if (search) {
+      setSearchQuery(search);
+      setSearchOpen(true);
+    }
+  }, [searchParams]);
+
+  // دالة البحث
+  const handleSearch = (e: React.FormEvent | React.KeyboardEvent) => {
+    e.preventDefault();
+
+    if (searchQuery.trim()) {
+      // البحث
+      const currentCategory = searchParams?.get("category");
+      const queryParams = new URLSearchParams();
+      queryParams.set("search", searchQuery.trim());
+
+      // الحفاظ على الـ category إذا كانت موجودة
+      if (currentCategory) {
+        queryParams.set("category", currentCategory);
+      }
+
+      // التوجه للصفحة الرئيسية مع الـ search query
+      if (pathname === "/") {
+        router.push(`/?${queryParams.toString()}`);
+      } else {
+        router.push(`/?${queryParams.toString()}`);
+      }
+    } else {
+      // إذا كان الـ search فارغ، إزالة الـ search من الـ URL
+      const currentCategory = searchParams?.get("category");
+      if (currentCategory) {
+        router.push(`/?category=${currentCategory}`);
+      } else {
+        router.push("/");
+      }
+    }
+  };
+
+  // مسح البحث
+  const clearSearch = () => {
+    setSearchQuery("");
+    const currentCategory = searchParams?.get("category");
+    if (currentCategory) {
+      router.push(`/?category=${currentCategory}`);
+    } else {
+      router.push("/");
+    }
+  };
 
   // جلب الأقسام
   useEffect(() => {
@@ -199,12 +257,32 @@ export default function MainHeader() {
         {searchOpen && (
           <div className="border-t border-[#e5e7eb] dark:border-[#4a4a4a] bg-[#f5f5f5] dark:bg-[#281313] p-4">
             <div className="container mx-auto px-4 md:px-8 lg:px-16">
-              <input
-                type="text"
-                placeholder="ابحث عن منتج..."
-                className="w-full px-4 py-2 rounded-lg border border-[#e5e7eb] dark:border-[#4a4a4a] bg-white dark:bg-[#2d1616] focus:outline-none focus:ring-2 focus:ring-[#e60000]"
-                autoFocus
-              />
+              <form onSubmit={handleSearch} className="relative">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleSearch(e);
+                    }
+                  }}
+                  placeholder="ابحث عن منتج... (اسم المنتج أو الوصف)"
+                  className="w-full px-4 py-2 pr-10 rounded-lg border border-[#e5e7eb] dark:border-[#4a4a4a] bg-white dark:bg-[#2d1616] focus:outline-none focus:ring-2 focus:ring-[#e60000]"
+                  autoFocus
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={clearSearch}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-[#666666] dark:text-[#aaaaaa] hover:text-[#e60000]"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
+              </form>
             </div>
           </div>
         )}
