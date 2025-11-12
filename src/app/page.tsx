@@ -70,6 +70,9 @@ export default function Home() {
   // حالة قائمة المستخدم المنسدلة
   const [showUserDropdown, setShowUserDropdown] = useState(false);
 
+  // حالة الفئة المختارة
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
   // تغيير الصور تلقائياً كل 5 ثوانٍ
   useEffect(() => {
     if (sliderImages.length > 0) {
@@ -135,20 +138,30 @@ export default function Home() {
   }, []);
 
   // تجميع المنتجات حسب القسم
-  const productsByCategory = categories.map((category) => ({
-    category,
-    products: products.filter((p) => p.category_id === category.id),
-  })).filter((group) => group.products.length > 0);
+  const productsByCategory = categories
+    .map((category) => ({
+      category,
+      products: products.filter((p) => p.category_id === category.id),
+    }))
+    .filter((group) => group.products.length > 0);
 
-  // فلترة المنتجات بناءً على البحث
-  const filteredProductsByCategory = productsByCategory.map((group) => ({
-    ...group,
-    products: searchQuery
-      ? group.products.filter((p) =>
-          p.title.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-      : group.products,
-  })).filter((group) => group.products.length > 0);
+  // فلترة المنتجات بناءً على الفئة المختارة والبحث
+  const filteredProductsByCategory = productsByCategory
+    .filter((group) => {
+      // إذا لم يتم اختيار فئة، اعرض جميع الفئات
+      if (!selectedCategory) return true;
+      // إذا تم اختيار فئة، اعرض الفئة المطابقة فقط
+      return group.category.name === selectedCategory;
+    })
+    .map((group) => ({
+      ...group,
+      products: searchQuery
+        ? group.products.filter((p) =>
+            p.title.toLowerCase().includes(searchQuery.toLowerCase())
+          )
+        : group.products,
+    }))
+    .filter((group) => group.products.length > 0);
 
   const cartItemsCount = cart.reduce((total, item) => total + item.quantity, 0);
 
@@ -308,23 +321,116 @@ export default function Home() {
 
           {/* Navigation Links */}
           <nav className="hidden md:flex justify-center items-center gap-8 pt-4 mt-2 border-t border-[#e5e7eb] dark:border-[#4a4a4a]">
-            <Link href="/" className="text-base font-medium text-[#333333] dark:text-[#f0f0f0] hover:text-[#e60000] transition-colors">
+            <button
+              onClick={() => setSelectedCategory(null)}
+              className={`text-base font-medium hover:text-[#e60000] transition-colors ${
+                selectedCategory === null
+                  ? "text-[#e60000] border-b-2 border-[#e60000]"
+                  : "text-[#333333] dark:text-[#f0f0f0]"
+              }`}
+            >
+              الكل
+            </button>
+            <button
+              onClick={() => setSelectedCategory("رجالي")}
+              className={`text-base font-medium hover:text-[#e60000] transition-colors ${
+                selectedCategory === "رجالي"
+                  ? "text-[#e60000] border-b-2 border-[#e60000]"
+                  : "text-[#333333] dark:text-[#f0f0f0]"
+              }`}
+            >
               رجالي
-            </Link>
-            <Link href="/" className="text-base font-medium text-[#333333] dark:text-[#f0f0f0] hover:text-[#e60000] transition-colors">
+            </button>
+            <button
+              onClick={() => setSelectedCategory("حريمي")}
+              className={`text-base font-medium hover:text-[#e60000] transition-colors ${
+                selectedCategory === "حريمي"
+                  ? "text-[#e60000] border-b-2 border-[#e60000]"
+                  : "text-[#333333] dark:text-[#f0f0f0]"
+              }`}
+            >
               حريمي
-            </Link>
-            <Link href="/" className="text-base font-medium text-[#333333] dark:text-[#f0f0f0] hover:text-[#e60000] transition-colors">
+            </button>
+            <button
+              onClick={() => setSelectedCategory("أطفال")}
+              className={`text-base font-medium hover:text-[#e60000] transition-colors ${
+                selectedCategory === "أطفال"
+                  ? "text-[#e60000] border-b-2 border-[#e60000]"
+                  : "text-[#333333] dark:text-[#f0f0f0]"
+              }`}
+            >
               أطفال
-            </Link>
-            <Link href="/" className="text-base font-medium text-[#333333] dark:text-[#f0f0f0] hover:text-[#e60000] transition-colors">
+            </button>
+            <button
+              onClick={() => setSelectedCategory("أحذية")}
+              className={`text-base font-medium hover:text-[#e60000] transition-colors ${
+                selectedCategory === "أحذية"
+                  ? "text-[#e60000] border-b-2 border-[#e60000]"
+                  : "text-[#333333] dark:text-[#f0f0f0]"
+              }`}
+            >
               أحذية
-            </Link>
+            </button>
           </nav>
         </div>
       </header>
 
       <main className="flex-grow">
+        {/* Mobile Navigation - Horizontal Scroll */}
+        <div className="md:hidden sticky top-0 z-30 bg-white dark:bg-[#2d1616] border-b border-[#e5e7eb] dark:border-[#4a4a4a] overflow-x-auto">
+          <nav className="flex items-center gap-1 px-4 py-3">
+            <button
+              onClick={() => setSelectedCategory(null)}
+              className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                selectedCategory === null
+                  ? "bg-[#e60000] text-white"
+                  : "bg-[#f5f5f5] dark:bg-[#281313] text-[#333333] dark:text-[#f0f0f0]"
+              }`}
+            >
+              الكل
+            </button>
+            <button
+              onClick={() => setSelectedCategory("رجالي")}
+              className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                selectedCategory === "رجالي"
+                  ? "bg-[#e60000] text-white"
+                  : "bg-[#f5f5f5] dark:bg-[#281313] text-[#333333] dark:text-[#f0f0f0]"
+              }`}
+            >
+              رجالي
+            </button>
+            <button
+              onClick={() => setSelectedCategory("حريمي")}
+              className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                selectedCategory === "حريمي"
+                  ? "bg-[#e60000] text-white"
+                  : "bg-[#f5f5f5] dark:bg-[#281313] text-[#333333] dark:text-[#f0f0f0]"
+              }`}
+            >
+              حريمي
+            </button>
+            <button
+              onClick={() => setSelectedCategory("أطفال")}
+              className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                selectedCategory === "أطفال"
+                  ? "bg-[#e60000] text-white"
+                  : "bg-[#f5f5f5] dark:bg-[#281313] text-[#333333] dark:text-[#f0f0f0]"
+              }`}
+            >
+              أطفال
+            </button>
+            <button
+              onClick={() => setSelectedCategory("أحذية")}
+              className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                selectedCategory === "أحذية"
+                  ? "bg-[#e60000] text-white"
+                  : "bg-[#f5f5f5] dark:bg-[#281313] text-[#333333] dark:text-[#f0f0f0]"
+              }`}
+            >
+              أحذية
+            </button>
+          </nav>
+        </div>
 
         {/* Sticky Search Bar */}
         {searchOpen && (
