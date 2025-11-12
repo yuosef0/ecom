@@ -52,22 +52,14 @@ export default function ProductDetailPage() {
 
   const fetchProduct = async (slugOrId: string) => {
     try {
-      // محاولة البحث بالـ slug أولاً
-      let { data, error } = await supabase
-        .from("products")
-        .select(`
-          *,
-          category:categories (
-            id,
-            name,
-            slug
-          )
-        `)
-        .eq("slug", slugOrId)
-        .single();
+      // التحقق إذا كان المعرف UUID (يحتوي على شرطات) أم slug
+      const isUUID = slugOrId.includes("-") && slugOrId.length > 30;
 
-      // إذا لم يُعثر على المنتج بالـ slug، جرب بالـ id
-      if (error && error.code === "PGRST116") {
+      let data = null;
+      let error = null;
+
+      if (isUUID) {
+        // البحث بالـ id أولاً
         const result = await supabase
           .from("products")
           .select(`
@@ -83,12 +75,55 @@ export default function ProductDetailPage() {
 
         data = result.data;
         error = result.error;
+      } else {
+        // البحث بالـ slug أولاً
+        const result = await supabase
+          .from("products")
+          .select(`
+            *,
+            category:categories (
+              id,
+              name,
+              slug
+            )
+          `)
+          .eq("slug", slugOrId)
+          .single();
+
+        data = result.data;
+        error = result.error;
+
+        // إذا لم يُعثر على المنتج بالـ slug، جرب بالـ id
+        if (error && error.code === "PGRST116") {
+          const idResult = await supabase
+            .from("products")
+            .select(`
+              *,
+              category:categories (
+                id,
+                name,
+                slug
+              )
+            `)
+            .eq("id", slugOrId)
+            .single();
+
+          data = idResult.data;
+          error = idResult.error;
+        }
       }
 
-      if (error) throw error;
-      setProduct(data);
-    } catch (error) {
+      if (error) {
+        console.error("خطأ Supabase:", error);
+        throw error;
+      }
+
+      if (data) {
+        setProduct(data);
+      }
+    } catch (error: any) {
       console.error("خطأ في جلب المنتج:", error);
+      console.error("Error details:", error?.message, error?.code, error?.details);
     } finally {
       setLoading(false);
     }
