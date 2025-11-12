@@ -43,15 +43,6 @@ export default function AdminSidebar() {
       ),
     },
     {
-      name: "إضافة منتج",
-      href: "/admin/products/new",
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      ),
-    },
-    {
       name: "الأقسام",
       href: "/admin/categories",
       icon: (
@@ -69,9 +60,6 @@ export default function AdminSidebar() {
         </svg>
       ),
     },
-  ];
-
-  const bottomNavItems = [
     {
       name: "السلايدر",
       href: "/admin/slider",
@@ -82,6 +70,8 @@ export default function AdminSidebar() {
       ),
     },
   ];
+
+  const bottomNavItems: any[] = [];
 
   return (
     <aside className="w-64 flex-shrink-0 bg-white dark:bg-[#182635] border-l border-slate-200 dark:border-slate-800">
