@@ -186,8 +186,6 @@ export default function AdminProductsPage() {
 
   // حذف منتج
   const handleDelete = async (id: string, title: string) => {
-    if (!confirm(`هل أنت متأكد من حذف المنتج: ${title}؟`)) return;
-
     try {
       const { error: deleteError } = await supabase
         .from("products")
