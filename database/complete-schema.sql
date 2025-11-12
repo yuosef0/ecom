@@ -608,7 +608,7 @@ CREATE POLICY "Admins can delete products"
 CREATE POLICY "Users can view own orders"
     ON orders FOR SELECT
     TO authenticated
-    USING (customer_email = (SELECT email FROM auth.users WHERE id = auth.uid()));
+    USING (customer_email = auth.email());
 
 -- Anyone can create orders (for checkout)
 CREATE POLICY "Anyone can create orders"
