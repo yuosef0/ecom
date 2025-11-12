@@ -1,72 +1,44 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 
 const TopBar = () => {
-  const messages = [
-    "الشحن بـ 9 جنيه فقط لكل الجمهورية لآخر الأسبوع",
-    "خصومات تصل إلى 50% على تشكيل محافظ الجلد الطبيعي",
-    "شحن مجاني للطلبات فوق 500 جنيه",
-    "منتجات أصلية 100% بأفضل الأسعار",
-  ];
-
-  const [index, setIndex] = useState(0);
-  const [direction, setDirection] = useState("next");
-
-  // التغيير التلقائي كل 5 ثوان
-  useEffect(() => {
-    const interval = setInterval(() => {
-      handleNext();
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [index]);
-
-  const handleNext = () => {
-    setDirection("next");
-    setIndex((prev) => (prev + 1) % messages.length);
-  };
-
-  const handlePrev = () => {
-    setDirection("prev");
-    setIndex((prev) => (prev - 1 + messages.length) % messages.length);
-  };
-
   return (
-    <div className="topbar">
-      {/* أيقونات السوشيال على الشمال */}
-      <div className="social-icons">
-        <a href="https://facebook.com" target="_blank" rel="noreferrer">
-          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-          </svg>
-        </a>
-        <a href="https://instagram.com" target="_blank" rel="noreferrer">
-          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-          </svg>
-        </a>
-        <a href="https://tiktok.com" target="_blank" rel="noreferrer">
-          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
-          </svg>
-        </a>
-      </div>
+    <div className="bg-[#e60000] text-white text-sm py-2 px-4 md:px-8 lg:px-16 overflow-hidden">
+      <div className="relative h-6">
+        <div className="absolute inset-0 flex items-center justify-between">
+          {/* Social Icons */}
+          <div className="flex items-center gap-3">
+            <a
+              href="https://facebook.com"
+              target="_blank"
+              rel="noreferrer"
+              className="hover:opacity-80 transition-opacity"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/>
+              </svg>
+            </a>
+            <a
+              href="https://instagram.com"
+              target="_blank"
+              rel="noreferrer"
+              className="hover:opacity-80 transition-opacity"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.85s-.011 3.584-.069 4.85c-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07s-3.584-.012-4.85-.07c-3.252-.148-4.771-1.691-4.919-4.919-.058-1.265-.069-1.645-.069-4.85s.011-3.584.069-4.85c.149-3.225 1.664-4.771 4.919-4.919C8.416 2.175 8.796 2.163 12 2.163zm0 1.441c-3.118 0-3.486.012-4.706.068-2.61.12-3.834 1.344-3.954 3.954-.056 1.22-.067 1.588-.067 4.706s.011 3.486.067 4.706c.12 2.61 1.344 3.834 3.954 3.954 1.22.056 1.588.067 4.706.067s3.486-.011 4.706-.067c2.61-.12 3.834-1.344 3.954-3.954.056-1.22.067-1.588.067-4.706s-.011-3.486-.067-4.706c-.12-2.61-1.344-3.834-3.954-3.954-1.22-.056-1.588-.067-4.706-.067zM12 6.883c-2.827 0-5.117 2.29-5.117 5.117s2.29 5.117 5.117 5.117 5.117-2.29 5.117-5.117-2.29-5.117-5.117-5.117zm0 8.792c-2.03 0-3.675-1.645-3.675-3.675s1.645-3.675 3.675-3.675 3.675 1.645 3.675 3.675-1.645 3.675-3.675 3.675zm5.22-8.219c-.588 0-1.065.477-1.065 1.065s.477 1.065 1.065 1.065 1.065-.477 1.065-1.065-.477-1.065-1.065-1.065z"/>
+              </svg>
+            </a>
+          </div>
 
-      {/* النص والأسهم في النص */}
-      <div className="center-content">
-        <button className="arrow-btn" onClick={handlePrev}>
-          &lt;
-        </button>
+          {/* Center Text */}
+          <p className="font-medium text-center absolute inset-x-0">
+            شحن مجاني للطلبات فوق 300 ريال
+          </p>
 
-        <div className="topbar-text-wrapper">
-          <span key={index} className={`topbar-text ${direction}`}>
-            {messages[index]}
-          </span>
+          {/* Empty space for balance */}
+          <div className="hidden md:block w-1/4"></div>
         </div>
-
-        <button className="arrow-btn" onClick={handleNext}>
-          &gt;
-        </button>
       </div>
     </div>
   );
