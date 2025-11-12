@@ -80,30 +80,6 @@ export default function Home() {
     }
   }, [sliderImages.length]);
 
-  // Animation خفيف للمنتجات
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("show");
-          }
-        });
-      },
-      {
-        threshold: 0.15,
-        rootMargin: "0px",
-      }
-    );
-
-    const productElements = document.querySelectorAll(".product-animate");
-    productElements.forEach((product) => observer.observe(product));
-
-    return () => {
-      productElements.forEach((product) => observer.unobserve(product));
-    };
-  }, [products]);
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -474,7 +450,7 @@ export default function Home() {
                         <Link
                           key={product.id}
                           href={`/products/${product.id}`}
-                          className="product-animate flex flex-col gap-3 pb-3 bg-white dark:bg-[#2d1616] rounded-lg shadow-sm overflow-hidden group hover:shadow-md transition-all duration-300"
+                          className="flex flex-col gap-3 pb-3 bg-white dark:bg-[#2d1616] rounded-lg shadow-sm overflow-hidden group hover:shadow-md transition-shadow duration-300"
                         >
                           <div
                             className={`relative w-full bg-center bg-no-repeat aspect-[3/4] bg-cover transition-transform duration-300 group-hover:scale-105 ${
