@@ -70,6 +70,9 @@ export default function Home() {
   // حالة قائمة المستخدم المنسدلة
   const [showUserDropdown, setShowUserDropdown] = useState(false);
 
+  // حالة الـ scroll animation
+  const [visibleProducts, setVisibleProducts] = useState<Set<string>>(new Set());
+
   // تغيير الصور تلقائياً كل 5 ثوانٍ
   useEffect(() => {
     if (sliderImages.length > 0) {
@@ -79,6 +82,33 @@ export default function Home() {
       return () => clearInterval(interval);
     }
   }, [sliderImages.length]);
+
+  // Intersection Observer للـ scroll animation
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const productId = entry.target.getAttribute("data-product-id");
+            if (productId) {
+              setVisibleProducts((prev) => new Set([...prev, productId]));
+            }
+          }
+        });
+      },
+      {
+        threshold: 0.1,
+        rootMargin: "0px 0px -50px 0px",
+      }
+    );
+
+    const productElements = document.querySelectorAll("[data-product-id]");
+    productElements.forEach((el) => observer.observe(el));
+
+    return () => {
+      productElements.forEach((el) => observer.unobserve(el));
+    };
+  }, [products]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -172,7 +202,7 @@ export default function Home() {
   }
 
   return (
-    <div className="relative flex w-full flex-col min-h-screen bg-white dark:bg-[#230f0f]">
+    <div className="relative flex w-full flex-col min-h-screen bg-[#f8f5f5] dark:bg-[#230f0f]">
       {/* TopBar Component */}
       <TopBar />
 
@@ -328,7 +358,7 @@ export default function Home() {
 
         {/* Sticky Search Bar */}
         {searchOpen && (
-          <div className="sticky top-[7.5rem] md:top-[9rem] z-30 px-4 md:px-8 lg:px-16 py-3 bg-white/80 dark:bg-[#230f0f]/80 backdrop-blur-sm shadow-sm">
+          <div className="sticky top-[7.5rem] md:top-[9rem] z-30 px-4 md:px-8 lg:px-16 py-3 bg-[#f8f5f5]/80 dark:bg-[#230f0f]/80 backdrop-blur-sm shadow-sm">
             <div className="flex flex-col min-w-40 h-12 w-full max-w-2xl mx-auto">
               <div className="flex w-full flex-1 items-stretch rounded-lg h-full shadow-md">
                 <div className="text-[#666666] dark:text-[#aaaaaa] flex bg-white dark:bg-[#2d1616] items-center justify-center pl-4 rounded-r-lg border-l border-[#e5e7eb] dark:border-[#4a4a4a]">
@@ -446,11 +476,18 @@ export default function Home() {
                           )
                         : 0;
 
+                      const isVisible = visibleProducts.has(product.id);
+
                       return (
                         <Link
                           key={product.id}
                           href={`/products/${product.id}`}
-                          className="flex flex-col gap-3 pb-3 bg-white dark:bg-[#2d1616] rounded-lg shadow-sm overflow-hidden group"
+                          data-product-id={product.id}
+                          className={`flex flex-col gap-3 pb-3 bg-white dark:bg-[#2d1616] rounded-lg shadow-sm overflow-hidden group transition-all duration-700 ${
+                            isVisible
+                              ? "opacity-100 translate-y-0"
+                              : "opacity-0 translate-y-10"
+                          }`}
                         >
                           <div
                             className={`relative w-full bg-center bg-no-repeat aspect-[3/4] bg-cover transition-transform duration-300 group-hover:scale-105 ${
