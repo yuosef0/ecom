@@ -5,7 +5,6 @@ import { useCart } from "../../contexts/CartContext";
 import { useAuth } from "../../contexts/AuthContext";
 import Link from "next/link";
 import { useState } from "react";
-import TopBar from "../../components/TopBar";
 import Footer from "../../components/Footer";
 
 export default function CartPage() {
@@ -170,18 +169,6 @@ export default function CartPage() {
   if (cart.length === 0) {
     return (
       <div className="relative flex w-full flex-col min-h-screen bg-[#f8f5f5] dark:bg-[#230f0f]">
-        <TopBar />
-
-        <header className="bg-white dark:bg-[#2d1616] sticky top-0 z-40 shadow-sm">
-          <div className="container mx-auto px-4 md:px-8 lg:px-16 py-4">
-            <div className="flex items-center justify-center">
-              <Link href="/" className="text-2xl md:text-3xl font-bold tracking-tight">
-                متجري
-              </Link>
-            </div>
-          </div>
-        </header>
-
         <main className="flex-1 flex items-center justify-center py-12">
           <div className="text-center">
             <div className="text-6xl mb-4">🛒</div>
@@ -207,24 +194,6 @@ export default function CartPage() {
 
   return (
     <div className="relative flex w-full flex-col min-h-screen bg-[#f8f5f5] dark:bg-[#230f0f]">
-      <TopBar />
-
-      {/* Header */}
-      <header className="sticky top-0 z-20 bg-white/80 dark:bg-[#2d1616]/80 backdrop-blur-sm border-b border-[#e5e7eb] dark:border-[#4a4a4a]">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-4 text-[#e60000]">
-              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-              <Link href="/" className="text-xl font-bold leading-tight tracking-tight text-[#333333] dark:text-[#f0f0f0]">
-                متجري
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
-
       <main className="flex-1 py-8 lg:py-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           {/* Page Title */}
