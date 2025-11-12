@@ -32,15 +32,10 @@ export default function AdminDashboard() {
       // جلب إحصائيات الطلبات
       const { data: orders } = await supabase.from("orders").select("*");
 
-      // جلب آخر 5 طلبات مع معلومات العميل
+      // جلب آخر 5 طلبات
       const { data: recent } = await supabase
         .from("orders")
-        .select(`
-          *,
-          profiles:user_id (
-            full_name
-          )
-        `)
+        .select("*")
         .order("created_at", { ascending: false })
         .limit(5);
 
@@ -222,7 +217,7 @@ export default function AdminDashboard() {
                             #{order.id.slice(0, 8)}
                           </td>
                           <td className="h-[72px] px-4 py-2 text-sm font-normal leading-normal text-slate-900 dark:text-white">
-                            {order.profiles?.full_name || order.customer_name || "عميل"}
+                            {order.customer_name || "عميل"}
                           </td>
                           <td className="h-[72px] px-4 py-2 text-sm font-normal leading-normal text-slate-500 dark:text-slate-400">
                             {order.total_amount.toFixed(0)} ر.س
