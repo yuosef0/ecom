@@ -156,8 +156,8 @@ export default function Home() {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">جاري تحميل المنتجات...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#e60000] mx-auto mb-4"></div>
+          <p className="text-[#666666] dark:text-[#aaaaaa]">جاري تحميل المنتجات...</p>
         </div>
       </div>
     );
@@ -211,25 +211,25 @@ export default function Home() {
                       className="fixed inset-0 z-10"
                       onClick={() => setShowUserDropdown(false)}
                     />
-                    <div className="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-20">
+                    <div className="absolute left-0 mt-2 w-48 bg-white dark:bg-[#2d1616] rounded-lg shadow-lg border border-[#e5e7eb] dark:border-[#4a4a4a] z-20">
                       {user ? (
                         <>
-                          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                            <p className="font-medium text-gray-900 dark:text-gray-100 text-sm">
+                          <div className="p-4 border-b border-[#e5e7eb] dark:border-[#4a4a4a]">
+                            <p className="font-medium text-[#333333] dark:text-[#f0f0f0] text-sm">
                               {user.email}
                             </p>
                           </div>
                           <div className="py-2">
                             <Link
                               href="/profile"
-                              className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition text-sm"
+                              className="block px-4 py-2 text-[#666666] dark:text-[#aaaaaa] hover:bg-[#f5f5f5] dark:hover:bg-[#281313] transition text-sm"
                               onClick={() => setShowUserDropdown(false)}
                             >
                               📝 حسابي
                             </Link>
                             <Link
                               href="/orders"
-                              className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition text-sm"
+                              className="block px-4 py-2 text-[#666666] dark:text-[#aaaaaa] hover:bg-[#f5f5f5] dark:hover:bg-[#281313] transition text-sm"
                               onClick={() => setShowUserDropdown(false)}
                             >
                               📦 طلباتي
@@ -237,20 +237,20 @@ export default function Home() {
                             {isAdmin && (
                               <Link
                                 href="/admin"
-                                className="block px-4 py-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition font-medium text-sm"
+                                className="block px-4 py-2 text-[#e60000] hover:bg-[#f5f5f5] dark:hover:bg-[#281313] transition font-medium text-sm"
                                 onClick={() => setShowUserDropdown(false)}
                               >
                                 ⚙️ لوحة التحكم
                               </Link>
                             )}
                           </div>
-                          <div className="border-t border-gray-200 dark:border-gray-700 py-2">
+                          <div className="border-t border-[#e5e7eb] dark:border-[#4a4a4a] py-2">
                             <button
                               onClick={() => {
                                 signOut();
                                 setShowUserDropdown(false);
                               }}
-                              className="block w-full text-right px-4 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 transition text-sm"
+                              className="block w-full text-right px-4 py-2 text-[#e60000] hover:bg-[#f5f5f5] dark:hover:bg-[#281313] transition text-sm"
                             >
                               🚪 تسجيل الخروج
                             </button>
@@ -260,14 +260,14 @@ export default function Home() {
                         <div className="py-2">
                           <Link
                             href="/login"
-                            className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition text-sm"
+                            className="block px-4 py-2 text-[#666666] dark:text-[#aaaaaa] hover:bg-[#f5f5f5] dark:hover:bg-[#281313] transition text-sm"
                             onClick={() => setShowUserDropdown(false)}
                           >
                             تسجيل الدخول
                           </Link>
                           <Link
                             href="/signup"
-                            className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition text-sm"
+                            className="block px-4 py-2 text-[#666666] dark:text-[#aaaaaa] hover:bg-[#f5f5f5] dark:hover:bg-[#281313] transition text-sm"
                             onClick={() => setShowUserDropdown(false)}
                           >
                             إنشاء حساب
@@ -307,17 +307,17 @@ export default function Home() {
           </div>
 
           {/* Navigation Links */}
-          <nav className="hidden md:flex justify-center items-center gap-8 pt-4 mt-2 border-t border-gray-200 dark:border-gray-700">
-            <Link href="/" className="text-base font-medium hover:text-[#e60000] transition-colors">
+          <nav className="hidden md:flex justify-center items-center gap-8 pt-4 mt-2 border-t border-[#e5e7eb] dark:border-[#4a4a4a]">
+            <Link href="/" className="text-base font-medium text-[#333333] dark:text-[#f0f0f0] hover:text-[#e60000] transition-colors">
               رجالي
             </Link>
-            <Link href="/" className="text-base font-medium hover:text-[#e60000] transition-colors">
+            <Link href="/" className="text-base font-medium text-[#333333] dark:text-[#f0f0f0] hover:text-[#e60000] transition-colors">
               حريمي
             </Link>
-            <Link href="/" className="text-base font-medium hover:text-[#e60000] transition-colors">
+            <Link href="/" className="text-base font-medium text-[#333333] dark:text-[#f0f0f0] hover:text-[#e60000] transition-colors">
               أطفال
             </Link>
-            <Link href="/" className="text-base font-medium hover:text-[#e60000] transition-colors">
+            <Link href="/" className="text-base font-medium text-[#333333] dark:text-[#f0f0f0] hover:text-[#e60000] transition-colors">
               أحذية
             </Link>
           </nav>
@@ -331,7 +331,7 @@ export default function Home() {
           <div className="sticky top-[7.5rem] md:top-[9rem] z-30 px-4 md:px-8 lg:px-16 py-3 bg-[#f8f5f5]/80 dark:bg-[#230f0f]/80 backdrop-blur-sm shadow-sm">
             <div className="flex flex-col min-w-40 h-12 w-full max-w-2xl mx-auto">
               <div className="flex w-full flex-1 items-stretch rounded-lg h-full shadow-md">
-                <div className="text-gray-600 dark:text-gray-400 flex bg-white dark:bg-[#2d1616] items-center justify-center pl-4 rounded-r-lg border-l border-gray-200 dark:border-gray-700">
+                <div className="text-[#666666] dark:text-[#aaaaaa] flex bg-white dark:bg-[#2d1616] items-center justify-center pl-4 rounded-r-lg border-l border-[#e5e7eb] dark:border-[#4a4a4a]">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
@@ -341,7 +341,7 @@ export default function Home() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="ابحث عن المنتجات..."
-                  className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-[#e60000]/50 border-none bg-white dark:bg-[#2d1616] h-full placeholder:text-gray-600 dark:placeholder:text-gray-400 px-4 rounded-r-none border-r-0 text-base font-normal leading-normal"
+                  className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-[#e60000]/50 border-none bg-white dark:bg-[#2d1616] h-full placeholder:text-[#666666] dark:placeholder:text-[#aaaaaa] px-4 rounded-r-none border-r-0 text-base font-normal leading-normal text-[#333333] dark:text-[#f0f0f0]"
                   autoFocus
                 />
               </div>
@@ -396,8 +396,8 @@ export default function Home() {
                 </div>
               </>
             ) : (
-              <div className="w-full aspect-[16/7] md:aspect-[16/6] bg-gray-200 dark:bg-gray-800 rounded-xl flex items-center justify-center">
-                <p className="text-gray-500 dark:text-gray-400">لا توجد صور في السلايدر</p>
+              <div className="w-full aspect-[16/7] md:aspect-[16/6] bg-[#f5f5f5] dark:bg-[#281313] rounded-xl flex items-center justify-center">
+                <p className="text-[#666666] dark:text-[#aaaaaa]">لا توجد صور في السلايدر</p>
               </div>
             )}
           </div>
@@ -407,7 +407,7 @@ export default function Home() {
         <div className="container mx-auto px-4 md:px-8 lg:px-16">
           {filteredProductsByCategory.length === 0 ? (
             <div className="text-center py-20">
-              <p className="text-gray-500 dark:text-gray-400 text-lg mb-4">
+              <p className="text-[#666666] dark:text-[#aaaaaa] text-lg mb-4">
                 {searchQuery ? "لا توجد نتائج للبحث" : "لا توجد منتجات حالياً"}
               </p>
               {searchQuery && (
@@ -424,7 +424,7 @@ export default function Home() {
               {filteredProductsByCategory.map(({ category, products: categoryProducts }) => (
                 <div key={category.id} className="mt-8">
                   {/* Category Title */}
-                  <h2 className="text-2xl md:text-3xl font-bold tracking-tight px-4 pb-3 pt-10">
+                  <h2 className="text-2xl md:text-3xl font-bold tracking-tight px-4 pb-3 pt-10 text-[#333333] dark:text-[#f0f0f0]">
                     {category.name}
                   </h2>
 
@@ -454,7 +454,7 @@ export default function Home() {
                         >
                           <div
                             className={`relative w-full bg-center bg-no-repeat aspect-[3/4] bg-cover transition-transform duration-300 group-hover:scale-105 ${
-                              !productImage && "bg-gray-200 dark:bg-gray-700"
+                              !productImage && "bg-[#f5f5f5] dark:bg-[#281313]"
                             }`}
                             style={
                               productImage
@@ -463,7 +463,7 @@ export default function Home() {
                             }
                           >
                             {!productImage && (
-                              <div className="flex items-center justify-center h-full text-gray-400">
+                              <div className="flex items-center justify-center h-full text-[#aaaaaa]">
                                 <span className="text-4xl">📦</span>
                               </div>
                             )}
@@ -474,7 +474,7 @@ export default function Home() {
                             )}
                           </div>
                           <div className="px-4">
-                            <p className="text-base font-medium leading-normal truncate">
+                            <p className="text-base font-medium leading-normal truncate text-[#333333] dark:text-[#f0f0f0]">
                               {product.title}
                             </p>
                             <div className="flex items-baseline gap-2 mt-1">
@@ -482,7 +482,7 @@ export default function Home() {
                                 {product.price.toFixed(2)} ريال
                               </p>
                               {hasDiscount && (
-                                <p className="text-sm font-normal text-gray-600 dark:text-gray-400 line-through">
+                                <p className="text-sm font-normal text-[#666666] dark:text-[#aaaaaa] line-through">
                                   {product.old_price!.toFixed(2)} ريال
                                 </p>
                               )}
