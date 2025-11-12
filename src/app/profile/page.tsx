@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useRouter } from "next/navigation";
-import TopBar from "../../components/TopBar";
 import Footer from "../../components/Footer";
 import { supabase } from "../../lib/supabaseClient";
 
@@ -156,8 +155,6 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-[#f8f5f5] dark:bg-[#230f0f]">
-      <TopBar />
-
       <main className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar */}

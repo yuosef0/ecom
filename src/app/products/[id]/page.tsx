@@ -6,7 +6,6 @@ import { supabase } from "../../../lib/supabaseClient";
 import { useCart } from "../../../contexts/CartContext";
 import { useAuth } from "../../../contexts/AuthContext";
 import Link from "next/link";
-import TopBar from "../../../components/TopBar";
 import Footer from "../../../components/Footer";
 
 interface Category {
@@ -140,55 +139,6 @@ export default function ProductDetailPage() {
 
   return (
     <div className="relative flex w-full flex-col min-h-screen bg-[#f8f5f5] dark:bg-[#230f0f]">
-      {/* TopBar Component */}
-      <TopBar />
-
-      {/* Main Header */}
-      <header className="bg-white dark:bg-[#2d1616] sticky top-0 z-40 shadow-sm">
-        <div className="container mx-auto px-4 md:px-8 lg:px-16 py-4">
-          <div className="flex items-center justify-between">
-            {/* Left Side Icons */}
-            <div className="flex items-center gap-4 w-1/3">
-              <Link
-                href="/"
-                aria-label="Back to home"
-                className="flex items-center gap-2 text-[#666666] dark:text-[#aaaaaa] hover:text-[#e60000] dark:hover:text-[#e60000] transition-colors"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-                <span className="hidden md:inline text-sm font-medium">العودة للمتجر</span>
-              </Link>
-            </div>
-
-            {/* Logo - Center */}
-            <div className="w-1/3 text-center">
-              <Link href="/" className="text-2xl md:text-3xl font-bold tracking-tight">
-                متجري
-              </Link>
-            </div>
-
-            {/* Cart Icon - Right */}
-            <div className="flex items-center justify-end gap-4 w-1/3">
-              <Link
-                href="/cart"
-                aria-label="Shopping Cart"
-                className="relative flex items-center justify-center p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-                {cartItemsCount > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#e60000] text-white text-xs font-bold">
-                    {cartItemsCount}
-                  </span>
-                )}
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
-
       <main className="flex-grow">
         <div className="container mx-auto px-4 md:px-8 lg:px-16 py-8">
           {/* Breadcrumbs */}
