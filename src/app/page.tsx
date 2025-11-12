@@ -96,13 +96,13 @@ export default function Home() {
       }
     );
 
-    const products = document.querySelectorAll(".product-animate");
-    products.forEach((product) => observer.observe(product));
+    const productElements = document.querySelectorAll(".product-animate");
+    productElements.forEach((product) => observer.observe(product));
 
     return () => {
-      products.forEach((product) => observer.unobserve(product));
+      productElements.forEach((product) => observer.unobserve(product));
     };
-  }, [filteredProductsByCategory]);
+  }, [products]);
 
   useEffect(() => {
     const fetchData = async () => {
