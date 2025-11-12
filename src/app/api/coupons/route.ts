@@ -35,6 +35,33 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createServerClient();
+
+    // Debug: Check session
+    const { data: { session } } = await supabase.auth.getSession();
+    console.log('🔍 API Route - Session check:', {
+      hasSession: !!session,
+      userId: session?.user?.id,
+      email: session?.user?.email,
+    });
+
+    // Debug: Check if user is admin
+    if (session) {
+      const { data: adminData, error: adminError } = await supabase
+        .from('admins')
+        .select('role, is_active')
+        .eq('user_id', session.user.id)
+        .single();
+
+      console.log('🔍 API Route - Admin check:', {
+        isAdmin: !!adminData,
+        role: adminData?.role,
+        isActive: adminData?.is_active,
+        error: adminError?.message,
+      });
+    } else {
+      console.error('❌ No session found in API route!');
+    }
+
     const body = await request.json();
     const {
       code,
@@ -87,6 +114,8 @@ export async function POST(request: NextRequest) {
       used_count: 0,
     };
 
+    console.log('🔍 Attempting to insert coupon:', couponData.code);
+
     const { data, error } = await supabase
       .from('coupons')
       .insert([couponData])
@@ -94,6 +123,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
+      console.error('❌ Insert error:', error);
       if (error.code === '23505') {
         return NextResponse.json(
           { error: 'كود الكوبون موجود مسبقاً' },
@@ -102,6 +132,8 @@ export async function POST(request: NextRequest) {
       }
       throw error;
     }
+
+    console.log('✅ Coupon inserted successfully:', data.code);
 
     return NextResponse.json(data, { status: 201 });
   } catch (error: any) {
