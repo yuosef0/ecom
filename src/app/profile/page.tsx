@@ -80,6 +80,17 @@ export default function ProfilePage() {
     try {
       if (!user) throw new Error("لا يوجد مستخدم مسجل");
 
+      // التأكد من الـ session وتحديثها إذا لزم الأمر
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+      if (sessionError || !session) {
+        setMessage("❌ الجلسة منتهية. الرجاء تسجيل الدخول مرة أخرى");
+        setTimeout(() => {
+          router.push("/login");
+        }, 2000);
+        return;
+      }
+
       // حفظ البيانات في جدول profiles
       const { error } = await supabase
         .from("profiles")
@@ -93,8 +104,20 @@ export default function ProfilePage() {
         });
 
       if (error) {
+        // طباعة تفاصيل الخطأ للـ debugging
+        console.error("Profile update error:", error);
+        console.error("Error code:", error.code);
+        console.error("Error message:", error.message);
+        console.error("Error details:", error.details);
+
         // التحقق من نوع الخطأ
-        if (
+        if (error.message?.includes("No API key")) {
+          setMessage(`❌ خطأ في الاتصال بقاعدة البيانات.
+
+الحل:
+1. حاول تسجيل الخروج ثم الدخول مرة أخرى
+2. إذا استمرت المشكلة، حدّث الصفحة (F5)`);
+        } else if (
           error.code === "42P01" ||
           error.message?.includes("relation") ||
           error.message?.includes("does not exist") ||
@@ -116,8 +139,16 @@ export default function ProfilePage() {
         setMessage("✅ تم تحديث الملف الشخصي بنجاح");
       }
     } catch (error: any) {
+      console.error("Caught error:", error);
+
       // التحقق مرة أخرى على مستوى catch
-      if (
+      if (error.message?.includes("No API key")) {
+        setMessage(`❌ خطأ في الاتصال بقاعدة البيانات.
+
+الحل:
+1. حاول تسجيل الخروج ثم الدخول مرة أخرى
+2. إذا استمرت المشكلة، حدّث الصفحة (F5)`);
+      } else if (
         error.message?.includes("could not find") ||
         error.message?.includes("schema cache") ||
         error.message?.includes("profiles")
