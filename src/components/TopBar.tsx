@@ -33,7 +33,7 @@ const TopBar = () => {
 
           {/* Center Text */}
           <p className="font-medium text-center absolute inset-x-0">
-            شحن مجاني للطلبات فوق 300 ريال
+            شحن مجاني للطلبات فوق 300 جنيه
           </p>
 
           {/* Empty space for balance */}

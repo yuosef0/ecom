@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           valid: false,
-          message: `الحد الأدنى للشراء ${coupon.min_purchase_amount} ريال`,
+          message: `الحد الأدنى للشراء ${coupon.min_purchase_amount} جنيه`,
           discount: 0
         },
         { status: 200 }

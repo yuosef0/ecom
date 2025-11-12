@@ -254,7 +254,7 @@ export default function CartPage() {
                             {item.title}
                           </p>
                           <p className="text-sm font-normal leading-normal text-[#666666] dark:text-[#aaaaaa]">
-                            السعر: {item.price.toFixed(2)} ريال
+                            السعر: {item.price.toFixed(2)} جنيه
                           </p>
                           {(item.size || item.color) && (
                             <p className="text-sm font-normal leading-normal text-[#666666] dark:text-[#aaaaaa]">
@@ -290,7 +290,7 @@ export default function CartPage() {
 
                       {/* Total Price */}
                       <div className="w-full md:w-1/5 text-left font-semibold text-[#333333] dark:text-[#f0f0f0]">
-                        {(item.price * item.quantity).toFixed(2)} ريال
+                        {(item.price * item.quantity).toFixed(2)} جنيه
                       </div>
 
                       {/* Delete Button */}
@@ -445,19 +445,19 @@ export default function CartPage() {
                   <div className="flex justify-between">
                     <span>المجموع الفرعي</span>
                     <span className="font-medium text-[#333333] dark:text-[#f0f0f0]">
-                      {subtotal.toFixed(2)} ريال
+                      {subtotal.toFixed(2)} جنيه
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span>رسوم الشحن</span>
                     <span className="font-medium text-[#333333] dark:text-[#f0f0f0]">
-                      {shippingCost.toFixed(2)} ريال
+                      {shippingCost.toFixed(2)} جنيه
                     </span>
                   </div>
                   {appliedCoupon && (
                     <div className="flex justify-between text-[#28a745]">
                       <span>الخصم ({appliedCoupon.code})</span>
-                      <span className="font-medium">-{appliedCoupon.discount.toFixed(2)} ريال</span>
+                      <span className="font-medium">-{appliedCoupon.discount.toFixed(2)} جنيه</span>
                     </div>
                   )}
                 </div>
@@ -466,7 +466,7 @@ export default function CartPage() {
 
                 <div className="flex justify-between items-center text-lg font-bold text-[#333333] dark:text-[#f0f0f0]">
                   <span>الإجمالي</span>
-                  <span>{finalTotal.toFixed(2)} ريال</span>
+                  <span>{finalTotal.toFixed(2)} جنيه</span>
                 </div>
 
                 {/* Coupon Section */}
@@ -505,7 +505,7 @@ export default function CartPage() {
                         <div>
                           <p className="font-semibold text-[#28a745]">{appliedCoupon.code}</p>
                           <p className="text-sm text-[#28a745]">
-                            خصم {appliedCoupon.discount.toFixed(2)} ريال
+                            خصم {appliedCoupon.discount.toFixed(2)} جنيه
                           </p>
                         </div>
                         <button

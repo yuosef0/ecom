@@ -419,11 +419,11 @@ export default function Home() {
                             </p>
                             <div className="flex items-baseline gap-2 mt-1">
                               <p className="text-lg font-bold text-[#e60000]">
-                                {product.price.toFixed(2)} ريال
+                                {product.price.toFixed(2)} جنيه
                               </p>
                               {hasDiscount && (
                                 <p className="text-sm font-normal text-[#666666] dark:text-[#aaaaaa] line-through">
-                                  {product.old_price!.toFixed(2)} ريال
+                                  {product.old_price!.toFixed(2)} جنيه
                                 </p>
                               )}
                             </div>

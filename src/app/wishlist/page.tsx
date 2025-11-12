@@ -169,11 +169,11 @@ export default function WishlistPage() {
 
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-2xl font-bold text-[#e60000]">
-                      {product.price} ريال
+                      {product.price} جنيه
                     </span>
                     {product.old_price && (
                       <span className="text-sm text-[#666666] dark:text-[#aaaaaa] line-through">
-                        {product.old_price} ريال
+                        {product.old_price} جنيه
                       </span>
                     )}
                   </div>

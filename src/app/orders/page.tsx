@@ -235,7 +235,7 @@ export default function OrdersPage() {
                         </div>
                       </div>
                       <p className="font-bold text-[#e60000]">
-                        {item.price} ريال
+                        {item.price} جنيه
                       </p>
                     </div>
                   ))}
@@ -255,7 +255,7 @@ export default function OrdersPage() {
                       المبلغ الإجمالي
                     </p>
                     <p className="text-2xl font-bold text-[#e60000]">
-                      {order.total_amount} ريال
+                      {order.total_amount} جنيه
                     </p>
                   </div>
                 </div>
