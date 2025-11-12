@@ -78,28 +78,34 @@ export default function AdminCategoriesPage() {
 
       if (editingCategory) {
         // تحديث فئة موجودة
-        const response = await fetch(`/api/categories/${editingCategory.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(categoryData),
-        });
+        const { error } = await supabase
+          .from("categories")
+          .update(categoryData)
+          .eq("id", editingCategory.id);
 
-        if (!response.ok) throw new Error("فشل في تحديث الفئة");
+        if (error) {
+          if (error.code === '23505') {
+            throw new Error("الـ slug موجود مسبقاً");
+          }
+          throw error;
+        }
 
         setMessage("✅ تم تحديث الفئة بنجاح!");
         setEditingCategory(null);
       } else {
         // إضافة فئة جديدة
-        const response = await fetch("/api/categories", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(categoryData),
-        });
+        const { error } = await supabase
+          .from("categories")
+          .insert([categoryData]);
 
-        if (!response.ok) throw new Error("فشل في إضافة الفئة");
+        if (error) {
+          if (error.code === '23505') {
+            throw new Error("الـ slug موجود مسبقاً");
+          }
+          throw error;
+        }
 
         setMessage("✅ تم إضافة الفئة بنجاح!");
-        setIsAddingNew(false);
       }
 
       // إعادة تعيين النموذج
@@ -125,17 +131,18 @@ export default function AdminCategoriesPage() {
     if (!confirm(`هل أنت متأكد من حذف الفئة: ${name}؟`)) return;
 
     try {
-      const response = await fetch(`/api/categories/${id}`, {
-        method: "DELETE",
-      });
+      const { error } = await supabase
+        .from("categories")
+        .delete()
+        .eq("id", id);
 
-      if (!response.ok) throw new Error("فشل في حذف الفئة");
+      if (error) throw error;
 
       setMessage("✅ تم حذف الفئة بنجاح!");
       fetchCategories();
     } catch (error: any) {
       console.error("خطأ في حذف الفئة:", error);
-      setMessage("❌ فشل في حذف الفئة");
+      setMessage("❌ فشل في حذف الفئة: " + error.message);
     }
   };
 
@@ -150,14 +157,12 @@ export default function AdminCategoriesPage() {
       display_order: category.display_order.toString(),
       is_active: category.is_active,
     });
-    setIsAddingNew(false);
     setMessage("");
   };
 
   // إلغاء التعديل
   const cancelEdit = () => {
     setEditingCategory(null);
-    setIsAddingNew(false);
     setFormData({
       name: "",
       slug: "",
