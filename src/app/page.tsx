@@ -334,17 +334,17 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Search Modal */}
+      {/* Search Bar */}
       {searchOpen && (
-        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-start justify-center pt-20">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl mx-4">
-            <div className="flex items-center gap-2 mb-4">
+        <div className="sticky top-0 z-40 bg-white shadow-md border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 py-4">
+            <div className="flex items-center gap-3">
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="ابحث عن منتج..."
-                className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-600"
+                className="flex-1 border border-gray-300 rounded-lg px-4 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent"
                 autoFocus
               />
               <button
@@ -352,11 +352,19 @@ export default function Home() {
                   setSearchOpen(false);
                   setSearchQuery("");
                 }}
-                className="text-gray-600 hover:text-red-600 text-2xl"
+                className="flex items-center gap-2 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium"
               >
-                ✕
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                إغلاق
               </button>
             </div>
+            {searchQuery && (
+              <p className="text-sm text-gray-600 mt-2">
+                {filteredProductsByCategory.reduce((total, group) => total + group.products.length, 0)} منتج
+              </p>
+            )}
           </div>
         </div>
       )}
