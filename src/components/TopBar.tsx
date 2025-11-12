@@ -70,8 +70,8 @@ const TopBar = () => {
   }, [messages.length]);
 
   return (
-    <div className="bg-[#e60000] text-white text-sm py-2 px-4 md:px-8 lg:px-16 overflow-hidden">
-      <div className="relative h-6">
+    <div className="bg-[#e60000] text-white text-base md:text-lg py-3 px-4 md:px-8 lg:px-16 overflow-hidden">
+      <div className="relative h-7">
         <div className="absolute inset-0 flex items-center justify-between">
           {/* Social Icons */}
           <div className="flex items-center gap-3">
@@ -98,12 +98,22 @@ const TopBar = () => {
           </div>
 
           {/* Center Text - Animated Messages */}
-          <div className="font-medium text-center absolute inset-x-0 px-20">
-            <div
-              key={currentIndex}
-              className="transition-opacity duration-500"
-            >
-              {messages[currentIndex]?.message || "شحن مجاني للطلبات فوق 300 جنيه"}
+          <div className="font-semibold text-center absolute inset-x-0 px-20">
+            <div className="relative h-7 overflow-hidden">
+              {messages.map((msg, index) => (
+                <div
+                  key={msg.id}
+                  className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ease-in-out ${
+                    index === currentIndex
+                      ? "opacity-100 translate-y-0"
+                      : index < currentIndex
+                      ? "opacity-0 -translate-y-full"
+                      : "opacity-0 translate-y-full"
+                  }`}
+                >
+                  {msg.message}
+                </div>
+              ))}
             </div>
           </div>
 
