@@ -70,9 +70,6 @@ export default function Home() {
   // حالة قائمة المستخدم المنسدلة
   const [showUserDropdown, setShowUserDropdown] = useState(false);
 
-  // حالة الـ scroll animation
-  const [visibleProducts, setVisibleProducts] = useState<Set<string>>(new Set());
-
   // تغيير الصور تلقائياً كل 5 ثوانٍ
   useEffect(() => {
     if (sliderImages.length > 0) {
@@ -83,26 +80,23 @@ export default function Home() {
     }
   }, [sliderImages.length]);
 
-  // Intersection Observer للـ scroll animation
+  // Scroll animation باستخدام CSS
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const productId = entry.target.getAttribute("data-product-id");
-            if (productId) {
-              setVisibleProducts((prev) => new Set([...prev, productId]));
-            }
+            entry.target.classList.add("animate-in");
           }
         });
       },
       {
         threshold: 0.1,
-        rootMargin: "0px 0px -50px 0px",
+        rootMargin: "0px 0px -100px 0px",
       }
     );
 
-    const productElements = document.querySelectorAll("[data-product-id]");
+    const productElements = document.querySelectorAll("[data-animate]");
     productElements.forEach((el) => observer.observe(el));
 
     return () => {
@@ -476,18 +470,12 @@ export default function Home() {
                           )
                         : 0;
 
-                      const isVisible = visibleProducts.has(product.id);
-
                       return (
                         <Link
                           key={product.id}
                           href={`/products/${product.id}`}
-                          data-product-id={product.id}
-                          className={`flex flex-col gap-3 pb-3 bg-white dark:bg-[#2d1616] rounded-lg shadow-sm overflow-hidden group transition-all duration-700 ${
-                            isVisible
-                              ? "opacity-100 translate-y-0"
-                              : "opacity-0 translate-y-10"
-                          }`}
+                          data-animate="true"
+                          className="flex flex-col gap-3 pb-3 bg-white dark:bg-[#2d1616] rounded-lg shadow-sm overflow-hidden group"
                         >
                           <div
                             className={`relative w-full bg-center bg-no-repeat aspect-[3/4] bg-cover transition-transform duration-300 group-hover:scale-105 ${
