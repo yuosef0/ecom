@@ -141,7 +141,25 @@ export default function AdminProductsPage() {
           : uploadedUrls;
       }
 
-      const slug = formData.title.toLowerCase().replace(/\s+/g, "-");
+      // إنشاء slug من العنوان (إزالة الأحرف العربية واستخدام timestamp)
+      const generateSlug = (title: string) => {
+        // إزالة الأحرف الخاصة والعربية
+        const cleaned = title
+          .replace(/[^a-zA-Z0-9\s-]/g, '') // إزالة كل شيء عدا الإنجليزية والأرقام
+          .replace(/\s+/g, '-') // استبدال المسافات بشرطات
+          .toLowerCase()
+          .trim();
+
+        // إذا كان النص فارغ (كله عربي)، استخدم timestamp + random
+        if (cleaned.length < 3) {
+          return `product-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+        }
+
+        // إضافة timestamp للتفرد
+        return `${cleaned}-${Date.now()}`;
+      };
+
+      const slug = generateSlug(formData.title);
       const productData = {
         title: formData.title,
         slug,
