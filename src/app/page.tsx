@@ -211,7 +211,7 @@ export default function Home() {
                       className="fixed inset-0 z-10"
                       onClick={() => setShowUserDropdown(false)}
                     />
-                    <div className="absolute left-0 mt-2 w-56 md:w-64 bg-white dark:bg-[#2d1616] rounded-lg shadow-lg border border-[#e5e7eb] dark:border-[#4a4a4a] z-20 max-w-[calc(100vw-2rem)]">
+                    <div className="absolute left-0 right-0 md:right-auto mt-2 w-full md:w-64 mx-4 md:mx-0 bg-white dark:bg-[#2d1616] rounded-lg shadow-lg border border-[#e5e7eb] dark:border-[#4a4a4a] z-20">
                       {user ? (
                         <>
                           <div className="p-4 border-b border-[#e5e7eb] dark:border-[#4a4a4a]">
