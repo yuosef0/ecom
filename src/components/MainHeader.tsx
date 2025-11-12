@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useCart } from "../contexts/CartContext";
+import { useWishlist } from "../contexts/WishlistContext";
 import { useAuth } from "../contexts/AuthContext";
 import { supabase } from "../lib/supabaseClient";
 import TopBar from "./TopBar";
@@ -16,6 +17,7 @@ interface Category {
 
 export default function MainHeader() {
   const { cart } = useCart();
+  const { wishlist } = useWishlist();
   const { user, signOut, isAdmin } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
@@ -27,6 +29,7 @@ export default function MainHeader() {
   const [categories, setCategories] = useState<Category[]>([]);
 
   const cartItemsCount = cart.reduce((total, item) => total + item.quantity, 0);
+  const wishlistCount = wishlist.length;
 
   // قراءة الـ search من الـ URL
   useEffect(() => {
@@ -221,8 +224,29 @@ export default function MainHeader() {
               </Link>
             </div>
 
-            {/* Cart Icon - Right */}
-            <div className="flex items-center justify-end gap-4 w-1/3">
+            {/* Wishlist & Cart Icons - Right */}
+            <div className="flex items-center justify-end gap-2 w-1/3">
+              {/* Wishlist Icon */}
+              <Link
+                href="/wishlist"
+                aria-label="Wishlist"
+                className="relative flex items-center justify-center p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                  />
+                </svg>
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#e60000] text-white text-xs font-bold">
+                    {wishlistCount}
+                  </span>
+                )}
+              </Link>
+
+              {/* Cart Icon */}
               <Link
                 href="/cart"
                 aria-label="Shopping Cart"

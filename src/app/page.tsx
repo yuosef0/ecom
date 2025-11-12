@@ -7,6 +7,7 @@ import { useCart } from "../contexts/CartContext";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import Footer from "../components/Footer";
+import WishlistButton from "../components/WishlistButton";
 
 interface Category {
   id: string;
@@ -407,6 +408,10 @@ export default function Home() {
                                 خصم {discountPercentage}%
                               </span>
                             )}
+                            {/* Wishlist Button */}
+                            <div className="absolute top-3 left-3 z-10">
+                              <WishlistButton productId={product.id} variant="icon" />
+                            </div>
                           </div>
                           <div className="px-4">
                             <p className="text-base font-medium leading-normal truncate text-[#333333] dark:text-[#f0f0f0]">
