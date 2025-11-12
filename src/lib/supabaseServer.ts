@@ -1,4 +1,4 @@
-import { createServerClient as createSSRClient } from '@supabase/ssr';
+import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 
 /**
@@ -8,28 +8,52 @@ import { cookies } from 'next/headers';
 export async function createServerClient() {
   const cookieStore = await cookies();
 
-  return createSSRClient(
+  const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) => {
-              cookieStore.set(name, value, options);
-            });
-          } catch {
-            // The `setAll` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing
-            // user sessions.
-          }
+      auth: {
+        flowType: 'pkce',
+        detectSessionInUrl: false,
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+      global: {
+        headers: {
+          cookie: cookieStore
+            .getAll()
+            .map((cookie) => `${cookie.name}=${cookie.value}`)
+            .join('; '),
         },
       },
     }
   );
+
+  // Try to get session from cookies
+  const allCookies = cookieStore.getAll();
+
+  // Find Supabase auth cookies (they typically start with 'sb-' followed by project ref)
+  const authCookie = allCookies.find(
+    (cookie) => cookie.name.includes('sb-') && cookie.name.includes('-auth-token')
+  );
+
+  if (authCookie) {
+    try {
+      const sessionData = JSON.parse(authCookie.value);
+      if (sessionData.access_token && sessionData.refresh_token) {
+        await supabase.auth.setSession({
+          access_token: sessionData.access_token,
+          refresh_token: sessionData.refresh_token,
+        });
+      }
+    } catch (e) {
+      // If parsing fails, the cookie might be in a different format
+      // Continue without session
+      console.error('Failed to parse auth cookie:', e);
+    }
+  }
+
+  return supabase;
 }
 
 /**
