@@ -172,7 +172,7 @@ export default function Home() {
   }
 
   return (
-    <div className="relative flex w-full flex-col min-h-screen bg-[#f8f5f5] dark:bg-[#230f0f]">
+    <div className="relative flex w-full flex-col min-h-screen bg-white dark:bg-[#230f0f]">
       {/* TopBar Component */}
       <TopBar />
 
@@ -328,7 +328,7 @@ export default function Home() {
 
         {/* Sticky Search Bar */}
         {searchOpen && (
-          <div className="sticky top-[7.5rem] md:top-[9rem] z-30 px-4 md:px-8 lg:px-16 py-3 bg-[#f8f5f5]/80 dark:bg-[#230f0f]/80 backdrop-blur-sm shadow-sm">
+          <div className="sticky top-[7.5rem] md:top-[9rem] z-30 px-4 md:px-8 lg:px-16 py-3 bg-white/80 dark:bg-[#230f0f]/80 backdrop-blur-sm shadow-sm">
             <div className="flex flex-col min-w-40 h-12 w-full max-w-2xl mx-auto">
               <div className="flex w-full flex-1 items-stretch rounded-lg h-full shadow-md">
                 <div className="text-[#666666] dark:text-[#aaaaaa] flex bg-white dark:bg-[#2d1616] items-center justify-center pl-4 rounded-r-lg border-l border-[#e5e7eb] dark:border-[#4a4a4a]">
