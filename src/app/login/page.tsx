@@ -8,6 +8,7 @@ import Link from "next/link";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -29,9 +30,11 @@ export default function LoginPage() {
     const { error } = await signInWithEmail(email, password);
 
     if (error) {
-      setError(error.message === "Invalid login credentials"
-        ? "البريد الإلكتروني أو كلمة المرور غير صحيحة"
-        : error.message);
+      setError(
+        error.message === "Invalid login credentials"
+          ? "البريد الإلكتروني أو كلمة المرور غير صحيحة"
+          : error.message
+      );
       setLoading(false);
     } else {
       router.push("/");
@@ -55,158 +58,169 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <Link href="/" className="flex justify-center text-4xl mb-2">
-            🛒
-          </Link>
-          <h2 className="text-center text-3xl font-extrabold text-gray-900">
-            تسجيل الدخول
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            أو{" "}
-            <Link
-              href="/signup"
-              className="font-medium text-blue-600 hover:text-blue-500"
+    <div className="relative flex min-h-screen w-full flex-col items-center justify-center bg-[#f8f5f5] dark:bg-[#230f0f] p-4">
+      <div className="w-full max-w-md rounded-xl bg-white dark:bg-[#2c1a1a] p-6 shadow-sm sm:p-8 md:p-10">
+        {/* Logo and Title */}
+        <div className="mb-8 text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#e60000]/10">
+            <svg
+              className="w-8 h-8 text-[#e60000]"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              إنشاء حساب جديد
-            </Link>
-          </p>
-        </div>
-
-        <div className="bg-white py-8 px-4 shadow-lg rounded-lg sm:px-10">
-          {/* Google Login Button */}
-          <button
-            onClick={handleGoogleLogin}
-            disabled={loading}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition"
-          >
-            <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
-                fill="#4285F4"
-                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-              />
-              <path
-                fill="#34A853"
-                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-              />
-              <path
-                fill="#FBBC05"
-                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-              />
-              <path
-                fill="#EA4335"
-                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
               />
             </svg>
-            تسجيل الدخول بواسطة Google
-          </button>
-
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">أو</span>
-              </div>
-            </div>
           </div>
+          <div className="flex flex-col gap-3">
+            <h1 className="text-3xl font-black leading-tight tracking-tight text-[#1d0c0c] dark:text-[#fcf8f8]">
+              أهلاً بعودتك!
+            </h1>
+            <p className="text-base font-normal leading-normal text-[#a14545] dark:text-[#eacdcd]">
+              سجّل الدخول للمتابعة إلى متجرك.
+            </p>
+          </div>
+        </div>
 
-          {/* Email Login Form */}
-          <form className="mt-6 space-y-6" onSubmit={handleEmailLogin}>
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-                {error}
-              </div>
-            )}
-
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
-              >
+        {/* Login Form */}
+        <form className="flex flex-col gap-5" onSubmit={handleEmailLogin}>
+          <div className="flex flex-col gap-4">
+            {/* Email Field */}
+            <label className="flex flex-col">
+              <p className="pb-2 text-base font-medium leading-normal text-[#1d0c0c] dark:text-[#fcf8f8]">
                 البريد الإلكتروني
-              </label>
+              </p>
               <input
-                id="email"
-                name="email"
                 type="email"
-                autoComplete="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="example@email.com"
+                className="form-input h-14 w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg border border-[#eacdcd] dark:border-[#5a4848] bg-[#fcf8f8] dark:bg-[#382626] p-[15px] text-base font-normal leading-normal text-[#1d0c0c] dark:text-[#fcf8f8] placeholder:text-[#a14545] dark:placeholder:text-[#b49898] focus:border-[#e60000] dark:focus:border-[#e60000] focus:outline-0 focus:ring-0"
+                placeholder="أدخل بريدك الإلكتروني"
               />
-            </div>
+            </label>
 
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
-              >
-                كلمة المرور
+            {/* Password Field */}
+            <div className="flex flex-col">
+              <label className="flex flex-col">
+                <p className="pb-2 text-base font-medium leading-normal text-[#1d0c0c] dark:text-[#fcf8f8]">
+                  كلمة المرور
+                </p>
+                <div className="relative flex w-full flex-1 items-stretch">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="form-input h-14 w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg border border-[#eacdcd] dark:border-[#5a4848] bg-[#fcf8f8] dark:bg-[#382626] p-[15px] pr-12 text-base font-normal leading-normal text-[#1d0c0c] dark:text-[#fcf8f8] placeholder:text-[#a14545] dark:placeholder:text-[#b49898] focus:border-[#e60000] dark:focus:border-[#e60000] focus:outline-0 focus:ring-0"
+                    placeholder="أدخل كلمة المرور"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 left-0 flex items-center pl-3 pr-[15px] cursor-pointer"
+                  >
+                    <svg
+                      className="w-6 h-6 text-[#a14545] dark:text-[#eacdcd] hover:text-[#e60000] dark:hover:text-[#e60000] transition-colors"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      {showPassword ? (
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                        />
+                      ) : (
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                        />
+                      )}
+                    </svg>
+                  </button>
+                </div>
               </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="••••••••"
-              />
+              <Link
+                href="#"
+                className="mt-2 text-sm font-normal leading-normal text-[#a14545] dark:text-[#eacdcd] underline hover:text-[#e60000] dark:hover:text-white transition-colors"
+              >
+                هل نسيت كلمة المرور؟
+              </Link>
             </div>
+          </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label
-                  htmlFor="remember-me"
-                  className="mr-2 block text-sm text-gray-900"
-                >
-                  تذكرني
-                </label>
-              </div>
-
-              <div className="text-sm">
-                <a
-                  href="#"
-                  className="font-medium text-blue-600 hover:text-blue-500"
-                >
-                  نسيت كلمة المرور؟
-                </a>
-              </div>
+          {/* Error Message */}
+          {error && (
+            <div className="rounded-lg bg-red-100 dark:bg-red-900/30 p-3 text-center text-sm text-red-700 dark:text-red-300">
+              {error}
             </div>
+          )}
 
+          {/* Submit Buttons */}
+          <div className="flex flex-col gap-4 pt-2">
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition"
+              className="flex h-12 min-w-[84px] max-w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-[#e60000] px-5 text-base font-bold leading-normal tracking-[0.015em] text-[#fcf8f8] transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? "جارٍ تسجيل الدخول..." : "تسجيل الدخول"}
+              <span className="truncate">
+                {loading ? "جارٍ تسجيل الدخول..." : "تسجيل الدخول"}
+              </span>
             </button>
-          </form>
 
-          <div className="mt-6">
-            <Link
-              href="/"
-              className="block text-center text-sm text-blue-600 hover:text-blue-500"
+            {/* Google Login Button */}
+            <button
+              type="button"
+              onClick={handleGoogleLogin}
+              disabled={loading}
+              className="flex h-12 w-full items-center justify-center gap-3 rounded-lg border border-[#eacdcd] dark:border-[#5a4848] bg-[#f8f5f5] dark:bg-[#382626] px-5 text-base font-medium text-[#1d0c0c] dark:text-[#fcf8f8] transition-colors hover:bg-gray-100 dark:hover:bg-[#432f2f] disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              ← العودة للمتجر
-            </Link>
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M22.56 12.25C22.56 11.45 22.49 10.68 22.36 9.92H12V14.26H18.04C17.74 15.65 16.92 16.85 15.77 17.61V20.12H19.52C21.55 18.21 22.56 15.47 22.56 12.25Z"
+                  fill="#4285F4"
+                />
+                <path
+                  d="M12 23C14.97 23 17.45 22.04 19.52 20.12L15.77 17.61C14.79 18.25 13.51 18.63 12 18.63C9.31 18.63 7.06 16.89 6.21 14.56H2.33V17.14C4.33 20.61 7.89 23 12 23Z"
+                  fill="#34A853"
+                />
+                <path
+                  d="M6.21 14.56C5.97 13.84 5.82 13.08 5.82 12.29C5.82 11.5 5.97 10.74 6.21 10.02V7.44H2.33C1.52 9.02 1 10.6 1 12.29C1 13.98 1.52 15.56 2.33 17.14L6.21 14.56Z"
+                  fill="#FBBC05"
+                />
+                <path
+                  d="M12 5.96C13.67 5.96 15.06 6.57 16.14 7.58L19.6 4.11C17.45 2.14 14.97 1 12 1C7.89 1 4.33 3.39 2.33 7.44L6.21 10.02C7.06 7.69 9.31 5.96 12 5.96Z"
+                  fill="#EA4335"
+                />
+              </svg>
+              <span>المتابعة باستخدام Google</span>
+            </button>
           </div>
+        </form>
+
+        {/* Sign Up Link */}
+        <div className="mt-8 text-center">
+          <p className="text-sm text-[#a14545] dark:text-[#eacdcd]">
+            ليس لديك حساب؟{" "}
+            <Link
+              href="/signup"
+              className="font-bold text-[#e60000] underline-offset-2 hover:underline"
+            >
+              أنشئ حساباً جديداً
+            </Link>
+          </p>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
