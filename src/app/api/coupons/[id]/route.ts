@@ -1,10 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { createServerClient } from '@/lib/supabaseServer';
 
 // GET - جلب كوبون واحد
 export async function GET(
@@ -12,6 +7,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    const supabase = await createServerClient();
     const { data, error } = await supabase
       .from('coupons')
       .select('*')
@@ -40,6 +36,7 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
+    const supabase = await createServerClient();
     const body = await request.json();
     const {
       code,
@@ -115,6 +112,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    const supabase = await createServerClient();
     const { error } = await supabase
       .from('coupons')
       .delete()

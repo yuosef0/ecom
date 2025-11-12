@@ -1,14 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { createServerClient } from '@/lib/supabaseServer';
 
 // GET - جلب جميع الكوبونات
 export async function GET(request: NextRequest) {
   try {
+    const supabase = await createServerClient();
     const { searchParams } = new URL(request.url);
     const includeInactive = searchParams.get('includeInactive') === 'true';
 
@@ -38,6 +34,7 @@ export async function GET(request: NextRequest) {
 // POST - إضافة كوبون جديد
 export async function POST(request: NextRequest) {
   try {
+    const supabase = await createServerClient();
     const body = await request.json();
     const {
       code,
