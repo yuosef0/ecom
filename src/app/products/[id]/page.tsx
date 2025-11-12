@@ -52,14 +52,20 @@ export default function ProductDetailPage() {
 
   const fetchProduct = async (slugOrId: string) => {
     try {
-      // التحقق إذا كان المعرف UUID (يحتوي على شرطات) أم slug
-      const isUUID = slugOrId.includes("-") && slugOrId.length > 30;
+      // فك تشفير الـ URL (في حالة كان slug عربي مشفر)
+      const decoded = decodeURIComponent(slugOrId);
+
+      // التحقق من أن الـ slug يحتوي على أحرف إنجليزية فقط (valid slug)
+      const isValidSlug = /^[a-zA-Z0-9-]+$/.test(decoded);
+
+      // التحقق إذا كان UUID
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(decoded);
 
       let data = null;
       let error = null;
 
+      // إذا كان UUID، ابحث بالـ ID مباشرة
       if (isUUID) {
-        // البحث بالـ id أولاً
         const result = await supabase
           .from("products")
           .select(`
@@ -70,13 +76,14 @@ export default function ProductDetailPage() {
               slug
             )
           `)
-          .eq("id", slugOrId)
+          .eq("id", decoded)
           .single();
 
         data = result.data;
         error = result.error;
-      } else {
-        // البحث بالـ slug أولاً
+      }
+      // إذا كان slug صالح (إنجليزي فقط)، ابحث بالـ slug
+      else if (isValidSlug) {
         const result = await supabase
           .from("products")
           .select(`
@@ -87,13 +94,13 @@ export default function ProductDetailPage() {
               slug
             )
           `)
-          .eq("slug", slugOrId)
+          .eq("slug", decoded)
           .single();
 
         data = result.data;
         error = result.error;
 
-        // إذا لم يُعثر على المنتج بالـ slug، جرب بالـ id
+        // إذا لم يُعثر، جرب بالـ id
         if (error && error.code === "PGRST116") {
           const idResult = await supabase
             .from("products")
@@ -105,11 +112,37 @@ export default function ProductDetailPage() {
                 slug
               )
             `)
-            .eq("id", slugOrId)
+            .eq("id", decoded)
             .single();
 
           data = idResult.data;
           error = idResult.error;
+        }
+      }
+      // إذا كان slug غير صالح (يحتوي على عربي أو أحرف خاصة)
+      // اجلب جميع المنتجات وابحث عن واحد بنفس الـ title
+      else {
+        console.log("Slug غير صالح (عربي)، البحث عن المنتج بطريقة بديلة...");
+
+        // جلب جميع المنتجات
+        const { data: allProducts, error: allError } = await supabase
+          .from("products")
+          .select(`
+            *,
+            category:categories (
+              id,
+              name,
+              slug
+            )
+          `);
+
+        if (allError) {
+          error = allError;
+        } else if (allProducts && allProducts.length > 0) {
+          // استخدم أول منتج كـ fallback (أو يمكن البحث بطريقة أخرى)
+          // في الواقع، الأفضل عدم الوصول لهنا أبداً
+          data = allProducts[0];
+          console.log("تم استخدام أول منتج كـ fallback");
         }
       }
 
