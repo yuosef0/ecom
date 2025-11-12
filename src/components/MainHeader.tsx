@@ -69,9 +69,10 @@ export default function MainHeader() {
     }
   };
 
-  // مسح البحث
+  // مسح البحث وإغلاق نموذج البحث
   const clearSearch = () => {
     setSearchQuery("");
+    setSearchOpen(false);
     const currentCategory = searchParams?.get("category");
     if (currentCategory) {
       router.push(`/?category=${currentCategory}`);
@@ -263,7 +264,7 @@ export default function MainHeader() {
         {searchOpen && (
           <div className="border-t border-[#e5e7eb] dark:border-[#4a4a4a] bg-[#f5f5f5] dark:bg-[#281313] p-4">
             <div className="container mx-auto px-4 md:px-8 lg:px-16">
-              <form onSubmit={handleSearch} className="relative">
+              <form onSubmit={handleSearch}>
                 <input
                   type="text"
                   value={searchQuery}
@@ -274,20 +275,9 @@ export default function MainHeader() {
                     }
                   }}
                   placeholder="ابحث عن منتج... (اسم المنتج أو الوصف)"
-                  className="w-full px-4 py-2 pr-10 rounded-lg border border-[#e5e7eb] dark:border-[#4a4a4a] bg-white dark:bg-[#2d1616] focus:outline-none focus:ring-2 focus:ring-[#e60000]"
+                  className="w-full px-4 py-2 rounded-lg border border-[#e5e7eb] dark:border-[#4a4a4a] bg-white dark:bg-[#2d1616] focus:outline-none focus:ring-2 focus:ring-[#e60000]"
                   autoFocus
                 />
-                {searchQuery && (
-                  <button
-                    type="button"
-                    onClick={clearSearch}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-[#666666] dark:text-[#aaaaaa] hover:text-[#e60000]"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                )}
               </form>
             </div>
           </div>
