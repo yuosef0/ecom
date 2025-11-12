@@ -37,10 +37,14 @@ export default function AdminOrdersPage() {
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error("خطأ Supabase:", error);
+        throw error;
+      }
       setOrders(data || []);
-    } catch (error) {
+    } catch (error: any) {
       console.error("خطأ في جلب الطلبات:", error);
+      console.error("Error details:", error.message, error.code, error.details);
     } finally {
       setLoading(false);
     }
@@ -58,22 +62,22 @@ export default function AdminOrdersPage() {
   ) => {
     setUpdating(true);
     try {
-      const response = await fetch(`/api/orders/${orderId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ [field]: value }),
-      });
+      const { data, error } = await supabase
+        .from("orders")
+        .update({ [field]: value })
+        .eq("id", orderId)
+        .select()
+        .single();
 
-      if (!response.ok) throw new Error("فشل في تحديث الطلب");
+      if (error) throw error;
 
       fetchOrders();
       if (selectedOrder?.id === orderId) {
-        const updated = await response.json();
-        setSelectedOrder(updated);
+        setSelectedOrder(data);
       }
     } catch (error: any) {
       console.error("خطأ في تحديث الطلب:", error);
-      alert("فشل في تحديث الطلب");
+      alert("فشل في تحديث الطلب: " + error.message);
     } finally {
       setUpdating(false);
     }
@@ -84,11 +88,12 @@ export default function AdminOrdersPage() {
     if (!confirm("هل أنت متأكد من حذف هذا الطلب؟")) return;
 
     try {
-      const response = await fetch(`/api/orders/${orderId}`, {
-        method: "DELETE",
-      });
+      const { error } = await supabase
+        .from("orders")
+        .delete()
+        .eq("id", orderId);
 
-      if (!response.ok) throw new Error("فشل في حذف الطلب");
+      if (error) throw error;
 
       fetchOrders();
       if (selectedOrder?.id === orderId) {
@@ -97,7 +102,7 @@ export default function AdminOrdersPage() {
       alert("تم حذف الطلب بنجاح");
     } catch (error: any) {
       console.error("خطأ في حذف الطلب:", error);
-      alert("فشل في حذف الطلب");
+      alert("فشل في حذف الطلب: " + error.message);
     }
   };
 
