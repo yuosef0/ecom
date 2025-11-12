@@ -282,10 +282,11 @@ export default function Home() {
           </div>
         )}
 
-        {/* Hero Slider/Carousel */}
-        <div className="container mx-auto px-4 md:px-8 lg:px-16 pt-6">
-          <div className="relative w-full overflow-hidden rounded-xl shadow-lg">
-            {sliderImages.length > 0 ? (
+        {/* Hero Slider/Carousel - Hidden when searching */}
+        {!searchQuery && (
+          <div className="container mx-auto px-4 md:px-8 lg:px-16 pt-6">
+            <div className="relative w-full overflow-hidden rounded-xl shadow-lg">
+              {sliderImages.length > 0 ? (
               <>
                 <div className="flex">
                   <div className="min-w-full duration-700 ease-in-out">
@@ -333,8 +334,9 @@ export default function Home() {
                 <p className="text-[#666666] dark:text-[#aaaaaa]">لا توجد صور في السلايدر</p>
               </div>
             )}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Product Grid Sections */}
         <div className="container mx-auto px-4 md:px-8 lg:px-16">
