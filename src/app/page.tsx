@@ -291,25 +291,30 @@ export default function Home() {
               <>
                 <div className="flex">
                   <div className="min-w-full duration-700 ease-in-out">
-                    <div
-                      className="relative w-full bg-center bg-no-repeat aspect-[16/7] md:aspect-[16/6] bg-cover flex flex-col justify-center items-start text-white p-8 md:p-16 rounded-xl"
-                      style={{
-                        backgroundImage: `url(${sliderImages[currentSlide]?.image_url})`,
-                      }}
-                    >
-                      <div className="bg-black/40 p-6 rounded-lg">
-                        <h2 className="text-3xl md:text-5xl font-extrabold mb-3">
-                          {sliderImages[currentSlide]?.title || "تشكيلة الصيف الجديدة"}
-                        </h2>
-                        <p className="text-lg md:text-xl mb-6 max-w-md">
-                          {sliderImages[currentSlide]?.description || "تسوق الآن أحدث صيحات الموضة بخصومات تصل إلى 50%"}
-                        </p>
-                        <Link
-                          href="/products"
-                          className="inline-flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-[#e60000] text-white text-base font-bold leading-normal tracking-wide hover:opacity-90 transition-opacity"
-                        >
-                          <span className="truncate">تسوق الآن</span>
-                        </Link>
+                    <div className="relative w-full aspect-[16/7] md:aspect-[16/6] bg-[#f5f5f5] dark:bg-[#1a1a1a] rounded-xl overflow-hidden">
+                      {/* Slider Image */}
+                      <img
+                        src={sliderImages[currentSlide]?.image_url}
+                        alt={sliderImages[currentSlide]?.title || "Slider Image"}
+                        className="w-full h-full object-contain"
+                      />
+
+                      {/* Overlay Content */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent flex flex-col justify-end items-start p-8 md:p-16">
+                        <div className="bg-black/40 backdrop-blur-sm p-6 rounded-lg max-w-2xl">
+                          <h2 className="text-3xl md:text-5xl font-extrabold mb-3 text-white">
+                            {sliderImages[currentSlide]?.title || "تشكيلة الصيف الجديدة"}
+                          </h2>
+                          <p className="text-lg md:text-xl mb-6 max-w-md text-white">
+                            {sliderImages[currentSlide]?.description || "تسوق الآن أحدث صيحات الموضة بخصومات تصل إلى 50%"}
+                          </p>
+                          <Link
+                            href="/products"
+                            className="inline-flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-[#e60000] text-white text-base font-bold leading-normal tracking-wide hover:opacity-90 transition-opacity"
+                          >
+                            <span className="truncate">تسوق الآن</span>
+                          </Link>
+                        </div>
                       </div>
                     </div>
                   </div>
