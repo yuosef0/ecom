@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "../../../lib/supabaseClient";
-import Link from "next/link";
 
 interface Category {
   id: string;
@@ -20,7 +19,7 @@ export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-  const [isAddingNew, setIsAddingNew] = useState(false);
+  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
 
   // Form states
   const [formData, setFormData] = useState({
@@ -170,107 +169,298 @@ export default function AdminCategoriesPage() {
     setMessage("");
   };
 
-  // الحصول على اسم الفئة الأم
-  const getParentCategoryName = (parentId: string | null) => {
-    if (!parentId) return "-";
-    const parent = categories.find((c) => c.id === parentId);
-    return parent ? parent.name : "-";
+  // تحديد/إلغاء تحديد فئة
+  const toggleCategorySelection = (categoryId: string) => {
+    const newSelected = new Set(selectedCategories);
+    if (newSelected.has(categoryId)) {
+      newSelected.delete(categoryId);
+    } else {
+      newSelected.add(categoryId);
+    }
+    setSelectedCategories(newSelected);
+  };
+
+  // تحديد/إلغاء تحديد الكل
+  const toggleSelectAll = () => {
+    if (selectedCategories.size === categories.length) {
+      setSelectedCategories(new Set());
+    } else {
+      setSelectedCategories(new Set(categories.map((c) => c.id)));
+    }
+  };
+
+  // نقل الفئة للأعلى أو للأسفل
+  const moveCategory = async (id: string, direction: "up" | "down") => {
+    const currentIndex = categories.findIndex((c) => c.id === id);
+    if (
+      currentIndex === -1 ||
+      (direction === "up" && currentIndex === 0) ||
+      (direction === "down" && currentIndex === categories.length - 1)
+    ) {
+      return;
+    }
+
+    const newIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+    const currentCategory = categories[currentIndex];
+    const targetCategory = categories[newIndex];
+
+    try {
+      await supabase
+        .from("categories")
+        .update({ display_order: targetCategory.display_order })
+        .eq("id", currentCategory.id);
+
+      await supabase
+        .from("categories")
+        .update({ display_order: currentCategory.display_order })
+        .eq("id", targetCategory.id);
+
+      fetchCategories();
+    } catch (error) {
+      console.error("Error moving category:", error);
+    }
   };
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link href="/admin" className="text-blue-600 hover:text-blue-700">
-                ← لوحة التحكم
-              </Link>
-              <h1 className="text-3xl font-bold text-gray-900">
-                📂 إدارة الفئات
-              </h1>
-            </div>
-            <div className="flex gap-2">
-              <Link
-                href="/admin/products"
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
-              >
-                إدارة المنتجات
-              </Link>
-              <Link
-                href="/admin/orders"
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
-              >
-                إدارة الطلبات
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* زر إضافة فئة جديدة */}
-        {!isAddingNew && !editingCategory && (
-          <button
-            onClick={() => setIsAddingNew(true)}
-            className="mb-6 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
-          >
-            ➕ إضافة فئة جديدة
-          </button>
-        )}
-
+    <div className="p-8">
+      <div className="mx-auto max-w-7xl">
         {/* رسالة النجاح/الخطأ */}
         {message && (
           <div
             className={`mb-6 p-4 rounded-lg ${
               message.includes("✅")
-                ? "bg-green-50 text-green-800 border border-green-200"
-                : "bg-red-50 text-red-800 border border-red-200"
+                ? "bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-300 border border-green-200 dark:border-green-800"
+                : "bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-300 border border-red-200 dark:border-red-800"
             }`}
           >
             {message}
           </div>
         )}
 
-        {/* نموذج إضافة/تعديل فئة */}
-        {(isAddingNew || editingCategory) && (
-          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-            <h2 className="text-xl font-bold mb-4">
-              {editingCategory ? "تعديل الفئة" : "إضافة فئة جديدة"}
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    اسم الفئة *
-                  </label>
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+          {/* Left Section: Table and Header */}
+          <div className="lg:col-span-2">
+            {/* Page Heading */}
+            <div className="flex flex-wrap items-center justify-between gap-4 pb-6">
+              <div className="flex flex-col">
+                <p className="text-3xl font-bold text-slate-900 dark:text-white">
+                  إدارة الأقسام
+                </p>
+                <p className="text-base text-slate-500 dark:text-slate-400">
+                  إدارة أقسام متجرك الإلكتروني
+                </p>
+              </div>
+            </div>
+
+            {/* Table */}
+            <div className="w-full overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-[#182635]">
+              {loading ? (
+                <div className="p-8 text-center">
+                  <div className="inline-block w-8 h-8 border-4 border-[#137fec] border-t-transparent rounded-full animate-spin"></div>
+                  <p className="mt-2 text-slate-500 dark:text-slate-400 text-sm">
+                    جارٍ التحميل...
+                  </p>
+                </div>
+              ) : categories.length === 0 ? (
+                <div className="p-8 text-center text-slate-500 dark:text-slate-400">
+                  لا توجد أقسام حالياً
+                </div>
+              ) : (
+                <table className="w-full text-right">
+                  <thead>
+                    <tr className="bg-slate-50 dark:bg-slate-900/50">
+                      <th className="w-12 p-4 text-center text-sm font-medium text-slate-600 dark:text-slate-400">
+                        <input
+                          type="checkbox"
+                          checked={
+                            categories.length > 0 &&
+                            selectedCategories.size === categories.length
+                          }
+                          onChange={toggleSelectAll}
+                          className="h-4 w-4 rounded border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-700 text-[#137fec] focus:ring-2 focus:ring-[#137fec]/50"
+                        />
+                      </th>
+                      <th className="w-12 p-4 text-center text-sm font-medium text-slate-600 dark:text-slate-400">
+                        #
+                      </th>
+                      <th className="p-4 text-right text-sm font-medium text-slate-600 dark:text-slate-400">
+                        اسم القسم
+                      </th>
+                      <th className="p-4 text-right text-sm font-medium text-slate-600 dark:text-slate-400">
+                        الاسم اللطيف (Slug)
+                      </th>
+                      <th className="p-4 text-right text-sm font-medium text-slate-600 dark:text-slate-400">
+                        الحالة
+                      </th>
+                      <th className="p-4 text-center text-sm font-medium text-slate-600 dark:text-slate-400">
+                        إجراءات
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                    {categories.map((category, index) => (
+                      <tr
+                        key={category.id}
+                        className="hover:bg-slate-50 dark:hover:bg-slate-900/50"
+                      >
+                        <td className="p-4 text-center">
+                          <input
+                            type="checkbox"
+                            checked={selectedCategories.has(category.id)}
+                            onChange={() => toggleCategorySelection(category.id)}
+                            className="h-4 w-4 rounded border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-700 text-[#137fec] focus:ring-2 focus:ring-[#137fec]/50"
+                          />
+                        </td>
+                        <td className="p-4 text-center text-slate-500 dark:text-slate-400">
+                          <div className="flex flex-col items-center">
+                            <button
+                              onClick={() => moveCategory(category.id, "up")}
+                              disabled={index === 0}
+                              className="text-slate-400 hover:text-slate-800 dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+                            >
+                              <svg
+                                className="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M5 15l7-7 7 7"
+                                />
+                              </svg>
+                            </button>
+                            <button
+                              onClick={() => moveCategory(category.id, "down")}
+                              disabled={index === categories.length - 1}
+                              className="text-slate-400 hover:text-slate-800 dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+                            >
+                              <svg
+                                className="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M19 9l-7 7-7-7"
+                                />
+                              </svg>
+                            </button>
+                          </div>
+                        </td>
+                        <td className="p-4 text-sm font-medium text-slate-800 dark:text-slate-200">
+                          {category.name}
+                        </td>
+                        <td className="p-4 text-sm text-slate-500 dark:text-slate-400">
+                          {category.slug}
+                        </td>
+                        <td className="p-4">
+                          <span
+                            className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${
+                              category.is_active
+                                ? "bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300"
+                                : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300"
+                            }`}
+                          >
+                            {category.is_active ? "نشط" : "غير نشط"}
+                          </span>
+                        </td>
+                        <td className="p-4 text-center">
+                          <div className="flex items-center justify-center gap-2">
+                            <button
+                              onClick={() => startEdit(category)}
+                              className="rounded-lg p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200"
+                            >
+                              <svg
+                                className="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                />
+                              </svg>
+                            </button>
+                            <button
+                              onClick={() =>
+                                handleDelete(category.id, category.name)
+                              }
+                              className="rounded-lg p-2 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/50"
+                            >
+                              <svg
+                                className="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                />
+                              </svg>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
+
+          {/* Right Section: Add/Edit Form */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-8 rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-[#182635]">
+              {/* Section Header */}
+              <h2 className="pb-6 text-xl font-bold text-slate-900 dark:text-white">
+                {editingCategory ? "تعديل قسم" : "إضافة قسم جديد"}
+              </h2>
+
+              <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+                {/* اسم القسم */}
+                <label className="flex flex-col">
+                  <p className="pb-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                    اسم القسم
+                  </p>
                   <input
                     type="text"
                     value={formData.name}
                     onChange={(e) => {
-                      setFormData({ ...formData, name: e.target.value });
-                      // Auto-generate slug
-                      if (!editingCategory) {
-                        setFormData({
-                          ...formData,
-                          name: e.target.value,
-                          slug: e.target.value
-                            .toLowerCase()
-                            .replace(/\s+/g, "-")
-                            .replace(/[^a-z0-9-]/g, ""),
-                        });
-                      }
+                      const newName = e.target.value;
+                      setFormData({
+                        ...formData,
+                        name: newName,
+                        slug: !editingCategory
+                          ? newName
+                              .toLowerCase()
+                              .replace(/\s+/g, "-")
+                              .replace(/[^a-z0-9-]/g, "")
+                          : formData.slug,
+                      });
                     }}
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="form-input w-full rounded-lg border border-slate-300 bg-slate-50 p-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#137fec] focus:ring-[#137fec] dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder:text-slate-500 dark:focus:border-[#137fec] dark:focus:ring-[#137fec]"
+                    placeholder="أدخل اسم القسم هنا"
                   />
-                </div>
+                </label>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Slug *
-                  </label>
+                {/* الاسم اللطيف */}
+                <label className="flex flex-col">
+                  <p className="pb-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                    الاسم اللطيف (Slug)
+                  </p>
                   <input
                     type="text"
                     value={formData.slug}
@@ -278,206 +468,71 @@ export default function AdminCategoriesPage() {
                       setFormData({ ...formData, slug: e.target.value })
                     }
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="form-input w-full rounded-lg border border-slate-300 bg-slate-50 p-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#137fec] focus:ring-[#137fec] dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder:text-slate-500 dark:focus:border-[#137fec] dark:focus:ring-[#137fec]"
+                    placeholder="مثال: men-clothing"
                   />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  الوصف
                 </label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    الفئة الأم
-                  </label>
-                  <select
-                    value={formData.parent_id}
+                {/* الوصف */}
+                <label className="flex flex-col">
+                  <p className="pb-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                    الوصف
+                  </p>
+                  <textarea
+                    value={formData.description}
                     onChange={(e) =>
-                      setFormData({ ...formData, parent_id: e.target.value })
+                      setFormData({ ...formData, description: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">لا يوجد (فئة رئيسية)</option>
-                    {categories
-                      .filter((c) => c.id !== editingCategory?.id)
-                      .map((category) => (
-                        <option key={category.id} value={category.id}>
-                          {category.name}
-                        </option>
-                      ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    ترتيب العرض
-                  </label>
-                  <input
-                    type="number"
-                    value={formData.display_order}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        display_order: e.target.value,
-                      })
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows={4}
+                    className="form-textarea w-full rounded-lg border border-slate-300 bg-slate-50 p-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#137fec] focus:ring-[#137fec] dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder:text-slate-500 dark:focus:border-[#137fec] dark:focus:ring-[#137fec]"
+                    placeholder="أدخل وصفًا موجزًا للقسم"
                   />
-                </div>
+                </label>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    الحالة
+                {/* Toggle Switch */}
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    تفعيل القسم
+                  </p>
+                  <label className="relative inline-flex cursor-pointer items-center">
+                    <input
+                      checked={formData.is_active}
+                      onChange={(e) =>
+                        setFormData({ ...formData, is_active: e.target.checked })
+                      }
+                      className="peer sr-only"
+                      type="checkbox"
+                    />
+                    <div className="peer h-6 w-11 rounded-full bg-slate-200 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-slate-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-[#137fec] peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#137fec]/30 dark:border-slate-600 dark:bg-slate-700 dark:peer-focus:ring-[#137fec]/80 rtl:peer-checked:after:-translate-x-full"></div>
                   </label>
-                  <select
-                    value={formData.is_active ? "true" : "false"}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        is_active: e.target.value === "true",
-                      })
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="true">نشط</option>
-                    <option value="false">معطل</option>
-                  </select>
                 </div>
-              </div>
 
-              <div className="flex gap-3">
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition"
-                >
-                  {submitting
-                    ? "جارٍ الحفظ..."
-                    : editingCategory
-                    ? "تحديث الفئة"
-                    : "إضافة الفئة"}
-                </button>
-                <button
-                  type="button"
-                  onClick={cancelEdit}
-                  className="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition"
-                >
-                  إلغاء
-                </button>
-              </div>
-            </form>
+                {/* Action Buttons */}
+                <div className="flex flex-col gap-3 pt-4 sm:flex-row">
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="flex-1 cursor-pointer items-center justify-center rounded-lg bg-[#137fec] px-5 py-3 text-sm font-semibold text-white hover:bg-[#137fec]/90 focus:outline-none focus:ring-4 focus:ring-[#137fec]/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {submitting
+                      ? "جارٍ الحفظ..."
+                      : editingCategory
+                      ? "حفظ التغييرات"
+                      : "حفظ القسم"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={cancelEdit}
+                    className="flex-1 cursor-pointer items-center justify-center rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-800 hover:bg-slate-100 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-slate-500 dark:hover:bg-slate-700 dark:focus:ring-slate-700"
+                  >
+                    إلغاء
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-        )}
-
-        {/* جدول الفئات */}
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <h2 className="text-xl font-bold p-6 border-b">الفئات الحالية</h2>
-
-          {loading ? (
-            <div className="p-8 text-center">
-              <div className="inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-              <p className="mt-2 text-gray-600">جارٍ التحميل...</p>
-            </div>
-          ) : categories.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">
-              لا توجد فئات حالياً
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
-                      اسم الفئة
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
-                      Slug
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
-                      الفئة الأم
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
-                      الترتيب
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
-                      الحالة
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
-                      الإجراءات
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {categories.map((category) => (
-                    <tr key={category.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4">
-                        <div className="font-medium text-gray-900">
-                          {category.name}
-                        </div>
-                        {category.description && (
-                          <div className="text-sm text-gray-500 truncate max-w-xs">
-                            {category.description}
-                          </div>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        {category.slug}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        {getParentCategoryName(category.parent_id)}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        {category.display_order}
-                      </td>
-                      <td className="px-6 py-4">
-                        <span
-                          className={`px-2 py-1 text-xs rounded-full ${
-                            category.is_active
-                              ? "bg-green-100 text-green-800"
-                              : "bg-red-100 text-red-800"
-                          }`}
-                        >
-                          {category.is_active ? "نشط" : "معطل"}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => startEdit(category)}
-                            className="text-blue-600 hover:text-blue-800 font-medium text-sm"
-                          >
-                            ✏️ تعديل
-                          </button>
-                          <button
-                            onClick={() =>
-                              handleDelete(category.id, category.name)
-                            }
-                            className="text-red-600 hover:text-red-800 font-medium text-sm"
-                          >
-                            🗑️ حذف
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
         </div>
       </div>
-    </main>
+    </div>
   );
 }
