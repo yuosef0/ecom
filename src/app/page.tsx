@@ -210,15 +210,102 @@ export default function Home() {
       {/* Main Header */}
       <header className="header">
         <div className="header-top">
-          {/* Search Icon - Left */}
-          <button
-            onClick={() => setSearchOpen(true)}
-            className="header-icon"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </button>
+          {/* Left Side Icons */}
+          <div className="flex items-center gap-3">
+            {/* Search Icon */}
+            <button
+              onClick={() => setSearchOpen(true)}
+              className="header-icon"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </button>
+
+            {/* Account Icon */}
+            <div className="relative">
+              <button
+                onClick={() => setShowUserDropdown(!showUserDropdown)}
+                className="header-icon"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </button>
+
+              {/* Account Dropdown Menu */}
+              {showUserDropdown && (
+                <>
+                  <div
+                    className="fixed inset-0 z-10"
+                    onClick={() => setShowUserDropdown(false)}
+                  />
+                  <div className="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border z-20">
+                    {user ? (
+                      <>
+                        <div className="p-4 border-b">
+                          <p className="font-medium text-gray-900 text-sm">{user.email}</p>
+                        </div>
+                        <div className="py-2">
+                          <Link
+                            href="/profile"
+                            className="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition text-sm"
+                            onClick={() => setShowUserDropdown(false)}
+                          >
+                            📝 حسابي
+                          </Link>
+                          <Link
+                            href="/orders"
+                            className="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition text-sm"
+                            onClick={() => setShowUserDropdown(false)}
+                          >
+                            📦 طلباتي
+                          </Link>
+                          {isAdmin && (
+                            <Link
+                              href="/admin"
+                              className="block px-4 py-2 text-blue-600 hover:bg-blue-50 transition font-medium text-sm"
+                              onClick={() => setShowUserDropdown(false)}
+                            >
+                              ⚙️ لوحة التحكم
+                            </Link>
+                          )}
+                        </div>
+                        <div className="border-t py-2">
+                          <button
+                            onClick={() => {
+                              signOut();
+                              setShowUserDropdown(false);
+                            }}
+                            className="block w-full text-right px-4 py-2 text-red-600 hover:bg-red-50 transition text-sm"
+                          >
+                            🚪 تسجيل الخروج
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="py-2">
+                        <Link
+                          href="/login"
+                          className="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition text-sm"
+                          onClick={() => setShowUserDropdown(false)}
+                        >
+                          تسجيل الدخول
+                        </Link>
+                        <Link
+                          href="/signup"
+                          className="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition text-sm"
+                          onClick={() => setShowUserDropdown(false)}
+                        >
+                          إنشاء حساب
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
 
           {/* Logo - Center */}
           <Link href="/" className="text-2xl font-black text-red-600">
@@ -240,64 +327,6 @@ export default function Home() {
 
         {/* Navigation Links */}
         <div className="header-links">
-          {user ? (
-            <div className="relative inline-block">
-              <button
-                onClick={() => setShowUserDropdown(!showUserDropdown)}
-                className="hover:text-red-600 transition"
-              >
-                {user.email}
-              </button>
-              {showUserDropdown && (
-                <>
-                  <div
-                    className="fixed inset-0 z-10"
-                    onClick={() => setShowUserDropdown(false)}
-                  />
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border z-20">
-                    <div className="py-2">
-                      <Link
-                        href="/profile"
-                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition"
-                        onClick={() => setShowUserDropdown(false)}
-                      >
-                        📝 حسابي
-                      </Link>
-                      <Link
-                        href="/orders"
-                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition"
-                        onClick={() => setShowUserDropdown(false)}
-                      >
-                        📦 طلباتي
-                      </Link>
-                      {isAdmin && (
-                        <Link
-                          href="/admin"
-                          className="block px-4 py-2 text-blue-600 hover:bg-blue-50 transition font-medium"
-                          onClick={() => setShowUserDropdown(false)}
-                        >
-                          ⚙️ لوحة التحكم
-                        </Link>
-                      )}
-                    </div>
-                    <div className="border-t py-2">
-                      <button
-                        onClick={() => {
-                          signOut();
-                          setShowUserDropdown(false);
-                        }}
-                        className="block w-full text-right px-4 py-2 text-red-600 hover:bg-red-50 transition"
-                      >
-                        🚪 تسجيل الخروج
-                      </button>
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-          ) : (
-            <Link href="/login">تسجيل الدخول</Link>
-          )}
           <Link href="/">رجالي</Link>
           <Link href="/">حريمي</Link>
           <Link href="/">أطفال</Link>
