@@ -88,31 +88,31 @@ export default function AdminCouponsPage() {
         usage_limit: formData.usage_limit ? parseInt(formData.usage_limit) : null,
         valid_until: formData.valid_until || null,
         is_active: formData.is_active,
+        used_count: 0,
       };
 
       if (editingCoupon) {
         // تحديث كوبون موجود
-        const response = await fetch(`/api/coupons/${editingCoupon.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(couponData),
-        });
+        const { error } = await supabase
+          .from("coupons")
+          .update(couponData)
+          .eq("id", editingCoupon.id);
 
-        if (!response.ok) throw new Error("فشل في تحديث الكوبون");
+        if (error) throw error;
 
         setMessage("✅ تم تحديث الكوبون بنجاح!");
         setEditingCoupon(null);
       } else {
         // إضافة كوبون جديد
-        const response = await fetch("/api/coupons", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(couponData),
-        });
+        const { error } = await supabase
+          .from("coupons")
+          .insert([couponData]);
 
-        if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.error || "فشل في إضافة الكوبون");
+        if (error) {
+          if (error.code === '23505') {
+            throw new Error("كود الكوبون موجود مسبقاً");
+          }
+          throw error;
         }
 
         setMessage("✅ تم إضافة الكوبون بنجاح!");
@@ -145,11 +145,12 @@ export default function AdminCouponsPage() {
     if (!confirm(`هل أنت متأكد من حذف الكوبون: ${code}؟`)) return;
 
     try {
-      const response = await fetch(`/api/coupons/${id}`, {
-        method: "DELETE",
-      });
+      const { error } = await supabase
+        .from("coupons")
+        .delete()
+        .eq("id", id);
 
-      if (!response.ok) throw new Error("فشل في حذف الكوبون");
+      if (error) throw error;
 
       setMessage("✅ تم حذف الكوبون بنجاح!");
       fetchCoupons();
