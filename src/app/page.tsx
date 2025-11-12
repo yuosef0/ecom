@@ -393,23 +393,20 @@ export default function Home() {
                           href={`/products/${product.slug || product.id}`}
                           className="flex flex-col gap-3 pb-3 bg-white dark:bg-[#2d1616] rounded-lg shadow-sm overflow-hidden group hover:shadow-md transition-shadow duration-300"
                         >
-                          <div
-                            className={`relative w-full bg-center bg-no-repeat aspect-[3/4] bg-cover transition-transform duration-300 group-hover:scale-105 ${
-                              !productImage && "bg-[#f5f5f5] dark:bg-[#281313]"
-                            }`}
-                            style={
-                              productImage
-                                ? { backgroundImage: `url(${productImage})` }
-                                : {}
-                            }
-                          >
-                            {!productImage && (
+                          <div className="relative w-full aspect-[3/4] overflow-hidden bg-[#f5f5f5] dark:bg-[#281313]">
+                            {productImage ? (
+                              <img
+                                src={productImage}
+                                alt={product.title}
+                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                              />
+                            ) : (
                               <div className="flex items-center justify-center h-full text-[#aaaaaa]">
                                 <span className="text-4xl">📦</span>
                               </div>
                             )}
                             {hasDiscount && (
-                              <span className="absolute top-3 right-3 bg-[#e60000] text-white text-xs font-bold px-2 py-1 rounded">
+                              <span className="absolute top-3 right-3 bg-[#e60000] text-white text-xs font-bold px-2 py-1 rounded z-10">
                                 خصم {discountPercentage}%
                               </span>
                             )}
