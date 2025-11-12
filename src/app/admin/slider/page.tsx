@@ -22,6 +22,7 @@ export default function AdminSliderPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
+  const [showForm, setShowForm] = useState(false);
 
   // Form states
   const [imageUrl, setImageUrl] = useState("");
@@ -58,7 +59,11 @@ export default function AdminSliderPage() {
       setImages(data || []);
     } catch (error: any) {
       console.error("Error fetching slider images:", error);
-      const errorMsg = error?.message || error?.error_description || JSON.stringify(error) || "خطأ غير معروف";
+      const errorMsg =
+        error?.message ||
+        error?.error_description ||
+        JSON.stringify(error) ||
+        "خطأ غير معروف";
       setMessage("❌ خطأ في تحميل الصور: " + errorMsg);
     } finally {
       setLoading(false);
@@ -69,7 +74,6 @@ export default function AdminSliderPage() {
     const file = e.target.files?.[0];
     if (file) {
       setImageFile(file);
-      // إنشاء معاينة للصورة
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewUrl(reader.result as string);
@@ -80,15 +84,15 @@ export default function AdminSliderPage() {
 
   const uploadImage = async (file: File): Promise<string> => {
     try {
-      const fileExt = file.name.split('.').pop();
+      const fileExt = file.name.split(".").pop();
       const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
       const filePath = `slider/${fileName}`;
 
       const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('product-images')
+        .from("product-images")
         .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false
+          cacheControl: "3600",
+          upsert: false,
         });
 
       if (uploadError) {
@@ -96,9 +100,9 @@ export default function AdminSliderPage() {
         throw new Error(uploadError.message || "فشل رفع الصورة");
       }
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('product-images')
-        .getPublicUrl(filePath);
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("product-images").getPublicUrl(filePath);
 
       return publicUrl;
     } catch (error: any) {
@@ -115,7 +119,6 @@ export default function AdminSliderPage() {
     try {
       let finalImageUrl = imageUrl;
 
-      // إذا كان هناك ملف جديد، قم برفعه
       if (imageFile) {
         setUploading(true);
         finalImageUrl = await uploadImage(imageFile);
@@ -129,7 +132,6 @@ export default function AdminSliderPage() {
       }
 
       if (editingId) {
-        // تحديث صورة موجودة
         const { error } = await supabase
           .from("slider_images")
           .update({
@@ -144,7 +146,6 @@ export default function AdminSliderPage() {
         if (error) throw error;
         setMessage("✅ تم تحديث الصورة بنجاح");
       } else {
-        // إضافة صورة جديدة
         const { error } = await supabase.from("slider_images").insert([
           {
             image_url: finalImageUrl,
@@ -159,12 +160,16 @@ export default function AdminSliderPage() {
         setMessage("✅ تم إضافة الصورة بنجاح");
       }
 
-      // Reset form
       resetForm();
       fetchSliderImages();
     } catch (error: any) {
       console.error("Error saving slider image:", error);
-      const errorMsg = error?.message || error?.error_description || error?.hint || JSON.stringify(error) || "خطأ غير معروف";
+      const errorMsg =
+        error?.message ||
+        error?.error_description ||
+        error?.hint ||
+        JSON.stringify(error) ||
+        "خطأ غير معروف";
       setMessage("❌ خطأ في حفظ الصورة: " + errorMsg);
     } finally {
       setSaving(false);
@@ -179,6 +184,8 @@ export default function AdminSliderPage() {
     setDescription(image.description || "");
     setDisplayOrder(image.display_order);
     setIsActive(image.is_active);
+    setPreviewUrl(image.image_url);
+    setShowForm(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -196,8 +203,43 @@ export default function AdminSliderPage() {
       fetchSliderImages();
     } catch (error: any) {
       console.error("Error deleting slider image:", error);
-      const errorMsg = error?.message || error?.error_description || JSON.stringify(error) || "خطأ غير معروف";
+      const errorMsg =
+        error?.message ||
+        error?.error_description ||
+        JSON.stringify(error) ||
+        "خطأ غير معروف";
       setMessage("❌ خطأ في حذف الصورة: " + errorMsg);
+    }
+  };
+
+  const moveImage = async (id: string, direction: "up" | "down") => {
+    const currentIndex = images.findIndex((img) => img.id === id);
+    if (
+      currentIndex === -1 ||
+      (direction === "up" && currentIndex === 0) ||
+      (direction === "down" && currentIndex === images.length - 1)
+    ) {
+      return;
+    }
+
+    const newIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+    const currentImage = images[currentIndex];
+    const targetImage = images[newIndex];
+
+    try {
+      await supabase
+        .from("slider_images")
+        .update({ display_order: targetImage.display_order })
+        .eq("id", currentImage.id);
+
+      await supabase
+        .from("slider_images")
+        .update({ display_order: currentImage.display_order })
+        .eq("id", targetImage.id);
+
+      fetchSliderImages();
+    } catch (error) {
+      console.error("Error moving image:", error);
     }
   };
 
@@ -210,255 +252,419 @@ export default function AdminSliderPage() {
     setIsActive(true);
     setImageFile(null);
     setPreviewUrl("");
+    setShowForm(false);
   };
 
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#137fec]"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold">إدارة السلايدر</h1>
-          <button
-            onClick={() => router.push("/admin")}
-            className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700"
-          >
-            العودة لصفحة الأدمن
-          </button>
+    <div className="p-6 lg:p-8">
+      <div className="w-full max-w-7xl mx-auto">
+        {/* Page Heading */}
+        <div className="flex flex-wrap justify-between items-center gap-4 mb-8">
+          <h1 className="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-tight">
+            إدارة السلايدر
+          </h1>
+          {!showForm && (
+            <button
+              onClick={() => setShowForm(true)}
+              className="flex items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-[#137fec] text-white text-sm font-bold leading-normal tracking-wide hover:bg-[#137fec]/90 transition-colors"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              <span className="truncate">إضافة جديد</span>
+            </button>
+          )}
         </div>
 
         {message && (
           <div
             className={`mb-6 p-4 rounded-lg ${
               message.includes("✅")
-                ? "bg-green-100 text-green-800"
-                : "bg-red-100 text-red-800"
+                ? "bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-300 border border-green-200 dark:border-green-800"
+                : "bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-300 border border-red-200 dark:border-red-800"
             }`}
           >
             {message}
           </div>
         )}
 
-        {/* Form */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h2 className="text-xl font-bold mb-4">
-            {editingId ? "تعديل الصورة" : "إضافة صورة جديدة"}
-          </h2>
+        {/* Add/Edit Form */}
+        {showForm && (
+          <section className="bg-white dark:bg-[#182635] p-6 rounded-xl border border-slate-200 dark:border-slate-800 mb-8">
+            <h2 className="text-slate-900 dark:text-white text-[22px] font-bold leading-tight tracking-tight pb-5 border-b border-slate-200 dark:border-slate-800">
+              {editingId ? "تعديل صورة السلايدر" : "إضافة صورة جديدة للسلايدر"}
+            </h2>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-gray-700 mb-2 font-semibold">
-                رفع صورة من الجهاز
-              </label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
-              />
-              <p className="text-sm text-gray-500 mt-1">
-                اختر صورة من جهازك (JPG, PNG, GIF)
-              </p>
-            </div>
+            <form onSubmit={handleSubmit}>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-6">
+                {/* File Uploader */}
+                <div className="lg:col-span-1 flex flex-col gap-4">
+                  <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    صورة السلايدر
+                  </label>
 
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">أو</span>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-gray-700 mb-2">
-                رابط الصورة
-              </label>
-              <input
-                type="url"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
-                placeholder="https://example.com/image.jpg"
-                disabled={!!imageFile}
-              />
-              <p className="text-sm text-gray-500 mt-1">
-                أو ضع رابط صورة من الإنترنت
-              </p>
-            </div>
-
-            <div>
-              <label className="block text-gray-700 mb-2">عنوان الصورة</label>
-              <input
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
-                placeholder="عنوان وصفي للصورة"
-              />
-            </div>
-
-            <div>
-              <label className="block text-gray-700 mb-2">الوصف</label>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
-                rows={3}
-                placeholder="وصف اختياري للصورة"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-gray-700 mb-2">ترتيب العرض</label>
-                <input
-                  type="number"
-                  value={displayOrder}
-                  onChange={(e) => setDisplayOrder(parseInt(e.target.value))}
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
-                  min="1"
-                />
-              </div>
-
-              <div>
-                <label className="block text-gray-700 mb-2">الحالة</label>
-                <select
-                  value={isActive ? "active" : "inactive"}
-                  onChange={(e) => setIsActive(e.target.value === "active")}
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
-                >
-                  <option value="active">نشط</option>
-                  <option value="inactive">غير نشط</option>
-                </select>
-              </div>
-            </div>
-
-            {/* معاينة الصورة */}
-            {(previewUrl || imageUrl) && (
-              <div>
-                <label className="block text-gray-700 mb-2 font-semibold">معاينة السلايدر:</label>
-                <div className="relative mx-auto bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-200 shadow-lg" style={{ width: '600px', height: '400px', maxWidth: '100%' }}>
-                  {/* Full Width Image Preview */}
-                  <div className="relative w-full h-full bg-gray-200">
-                    <img
-                      src={previewUrl || imageUrl}
-                      alt="Preview"
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.src =
-                          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='400'%3E%3Crect fill='%23ddd' width='800' height='400'/%3E%3Ctext fill='%23999' font-family='sans-serif' font-size='40' dy='10.5' font-weight='bold' x='50%25' y='50%25' text-anchor='middle'%3Eخطأ في تحميل الصورة%3C/text%3E%3C/svg%3E";
-                      }}
-                    />
-                  </div>
-                </div>
-                <p className="text-xs text-gray-500 mt-2">
-                  💡 ستظهر الصورة بعرض كامل في الصفحة الرئيسية
-                </p>
-              </div>
-            )}
-
-            <div className="flex gap-3">
-              <button
-                type="submit"
-                disabled={saving || uploading}
-                className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 disabled:opacity-50"
-              >
-                {uploading
-                  ? "جاري رفع الصورة..."
-                  : saving
-                  ? "جاري الحفظ..."
-                  : editingId
-                  ? "تحديث"
-                  : "إضافة"}
-              </button>
-
-              {editingId && (
-                <button
-                  type="button"
-                  onClick={resetForm}
-                  className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700"
-                >
-                  إلغاء التعديل
-                </button>
-              )}
-            </div>
-          </form>
-        </div>
-
-        {/* List of Images */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-bold mb-4">
-            الصور الحالية ({images.length})
-          </h2>
-
-          {images.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">
-              لا توجد صور في السلايدر حالياً
-            </p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {images.map((image) => (
-                <div
-                  key={image.id}
-                  className="border rounded-lg overflow-hidden hover:shadow-lg transition"
-                >
-                  <div className="relative h-48 bg-gray-100">
-                    <img
-                      src={image.image_url}
-                      alt={image.title || "Slider Image"}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.src =
-                          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23ddd' width='400' height='300'/%3E%3Ctext fill='%23999' font-family='sans-serif' font-size='20' dy='10.5' font-weight='bold' x='50%25' y='50%25' text-anchor='middle'%3Eخطأ في تحميل الصورة%3C/text%3E%3C/svg%3E";
-                      }}
-                    />
-                    {!image.is_active && (
-                      <div className="absolute top-2 right-2 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold">
-                        غير نشط
+                  {!previewUrl ? (
+                    <div className="flex flex-col items-center gap-4 rounded-lg border-2 border-dashed border-slate-300 dark:border-slate-600 px-6 py-10 text-center">
+                      <svg
+                        className="w-12 h-12 text-slate-400 dark:text-slate-500"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                        />
+                      </svg>
+                      <div className="flex flex-col items-center gap-1">
+                        <p className="text-slate-900 dark:text-white text-base font-bold leading-tight">
+                          اسحب وأفلت الصورة هنا
+                        </p>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm font-normal">
+                          أو
+                        </p>
                       </div>
-                    )}
-                    <div className="absolute top-2 left-2 bg-black/70 text-white px-3 py-1 rounded-full text-xs font-bold">
-                      #{image.display_order}
+                      <label className="cursor-pointer">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleFileChange}
+                          className="hidden"
+                        />
+                        <span className="flex items-center justify-center rounded-lg h-9 px-4 bg-[#137fec]/20 text-[#137fec] text-sm font-bold leading-normal tracking-wide hover:bg-[#137fec]/30 transition-colors">
+                          تصفح الملفات
+                        </span>
+                      </label>
                     </div>
+                  ) : (
+                    <div className="relative rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800">
+                      <img
+                        src={previewUrl}
+                        alt="Preview"
+                        className="w-full h-48 object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPreviewUrl("");
+                          setImageFile(null);
+                          setImageUrl("");
+                        }}
+                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                      >
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+
+                  {uploading && (
+                    <div className="flex flex-col gap-2">
+                      <div className="flex gap-4 justify-between">
+                        <p className="text-slate-900 dark:text-white text-sm font-medium leading-normal">
+                          جاري الرفع...
+                        </p>
+                      </div>
+                      <div className="rounded-full bg-[#137fec]/20 h-2">
+                        <div
+                          className="h-2 rounded-full bg-[#137fec] animate-pulse"
+                          style={{ width: "100%" }}
+                        ></div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Form Fields */}
+                <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="md:col-span-2">
+                    <label
+                      className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+                      htmlFor="title"
+                    >
+                      العنوان
+                    </label>
+                    <input
+                      className="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent focus:ring-2 focus:ring-[#137fec]/50 focus:border-[#137fec] dark:text-slate-200 transition"
+                      id="title"
+                      placeholder="مثال: خصومات نهاية الموسم"
+                      type="text"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                    />
                   </div>
 
-                  <div className="p-4">
-                    <h3 className="font-bold mb-2">
-                      {image.title || "بدون عنوان"}
-                    </h3>
-                    {image.description && (
-                      <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                        {image.description}
-                      </p>
-                    )}
+                  <div className="md:col-span-2">
+                    <label
+                      className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+                      htmlFor="description"
+                    >
+                      الوصف
+                    </label>
+                    <textarea
+                      className="w-full p-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent focus:ring-2 focus:ring-[#137fec]/50 focus:border-[#137fec] dark:text-slate-200 transition"
+                      id="description"
+                      placeholder="وصف قصير وموجز للعرض"
+                      rows={3}
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                    ></textarea>
+                  </div>
 
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleEdit(image)}
-                        className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm"
-                      >
-                        تعديل
-                      </button>
-                      <button
-                        onClick={() => handleDelete(image.id)}
-                        className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 text-sm"
-                      >
-                        حذف
-                      </button>
-                    </div>
+                  <div>
+                    <label
+                      className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+                      htmlFor="order"
+                    >
+                      ترتيب العرض
+                    </label>
+                    <input
+                      className="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent focus:ring-2 focus:ring-[#137fec]/50 focus:border-[#137fec] dark:text-slate-200 transition"
+                      id="order"
+                      type="number"
+                      min="1"
+                      value={displayOrder}
+                      onChange={(e) => setDisplayOrder(parseInt(e.target.value))}
+                    />
+                  </div>
+
+                  <div className="flex flex-col justify-start">
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                      الحالة
+                    </label>
+                    <label
+                      className="inline-flex items-center cursor-pointer"
+                      htmlFor="status-toggle"
+                    >
+                      <input
+                        checked={isActive}
+                        className="sr-only peer"
+                        id="status-toggle"
+                        type="checkbox"
+                        onChange={(e) => setIsActive(e.target.checked)}
+                      />
+                      <div className="relative w-11 h-6 bg-slate-200 dark:bg-slate-700 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-[#137fec]"></div>
+                      <span className="ms-3 text-sm font-medium text-slate-900 dark:text-slate-300">
+                        تفعيل
+                      </span>
+                    </label>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="md:col-span-2 flex justify-end items-center gap-3 pt-4 mt-4 border-t border-slate-200 dark:border-slate-800">
+                    <button
+                      type="button"
+                      onClick={resetForm}
+                      className="flex items-center justify-center rounded-lg h-10 px-4 bg-slate-200 dark:bg-slate-700 dark:text-slate-200 text-slate-800 text-sm font-bold hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors"
+                    >
+                      <span className="truncate">إلغاء</span>
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={saving || uploading}
+                      className="flex items-center justify-center rounded-lg h-10 px-4 bg-[#137fec] text-white text-sm font-bold hover:bg-[#137fec]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <span className="truncate">
+                        {uploading
+                          ? "جاري رفع الصورة..."
+                          : saving
+                          ? "جاري الحفظ..."
+                          : editingId
+                          ? "تحديث"
+                          : "حفظ"}
+                      </span>
+                    </button>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+              </div>
+            </form>
+          </section>
+        )}
+
+        {/* Data Table */}
+        <section className="bg-white dark:bg-[#182635] rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+          <div className="overflow-x-auto">
+            {images.length === 0 ? (
+              <div className="p-8 text-center text-slate-500 dark:text-slate-400">
+                لا توجد صور في السلايدر حالياً
+              </div>
+            ) : (
+              <table className="w-full text-sm text-right text-slate-500 dark:text-slate-400">
+                <thead className="text-xs text-slate-700 dark:text-slate-300 uppercase bg-slate-50 dark:bg-slate-900/50">
+                  <tr>
+                    <th className="px-6 py-3" scope="col">
+                      معاينة
+                    </th>
+                    <th className="px-6 py-3" scope="col">
+                      العنوان
+                    </th>
+                    <th className="px-6 py-3 min-w-48" scope="col">
+                      الوصف
+                    </th>
+                    <th className="px-6 py-3" scope="col">
+                      ترتيب العرض
+                    </th>
+                    <th className="px-6 py-3" scope="col">
+                      الحالة
+                    </th>
+                    <th className="px-6 py-3" scope="col">
+                      إجراءات
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {images.map((image, index) => (
+                    <tr
+                      key={image.id}
+                      className="bg-white dark:bg-[#182635] border-b dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors"
+                    >
+                      <td className="p-4">
+                        <img
+                          className="w-24 h-12 object-cover rounded-md"
+                          src={image.image_url}
+                          alt={image.title || "Slider"}
+                        />
+                      </td>
+                      <td className="px-6 py-4 font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                        {image.title || "بدون عنوان"}
+                      </td>
+                      <td className="px-6 py-4">
+                        {image.description || "لا يوجد وصف"}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2">
+                          <span>{image.display_order}</span>
+                          <div className="flex flex-col">
+                            <button
+                              onClick={() => moveImage(image.id, "up")}
+                              disabled={index === 0}
+                              className="text-slate-400 hover:text-slate-800 dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+                            >
+                              <svg
+                                className="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M5 15l7-7 7 7"
+                                />
+                              </svg>
+                            </button>
+                            <button
+                              onClick={() => moveImage(image.id, "down")}
+                              disabled={index === images.length - 1}
+                              className="text-slate-400 hover:text-slate-800 dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+                            >
+                              <svg
+                                className="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M19 9l-7 7-7-7"
+                                />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        {image.is_active ? (
+                          <span className="inline-flex items-center bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">
+                            فعال
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-gray-700 dark:text-gray-300">
+                            غير فعال
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-4">
+                          <button
+                            onClick={() => handleEdit(image)}
+                            className="text-slate-500 hover:text-[#137fec] dark:hover:text-[#137fec] transition-colors"
+                          >
+                            <svg
+                              className="w-5 h-5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                              />
+                            </svg>
+                          </button>
+                          <button
+                            onClick={() => handleDelete(image.id)}
+                            className="text-slate-500 hover:text-red-600 dark:hover:text-red-500 transition-colors"
+                          >
+                            <svg
+                              className="w-5 h-5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </section>
       </div>
     </div>
   );
