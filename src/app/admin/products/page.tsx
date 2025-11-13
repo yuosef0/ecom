@@ -57,13 +57,12 @@ export default function AdminProductsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
 
-  // جلب الأقسام
+  // جلب الأقسام (جميع الأقسام في الأدمن)
   const fetchCategories = async () => {
     try {
       const { data, error } = await supabase
         .from("categories")
         .select("*")
-        .eq("is_active", true)
         .order("display_order");
 
       if (error) throw error;
@@ -452,9 +451,19 @@ export default function AdminProductsPage() {
               {/* القسم والكمية */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    القسم *
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-sm font-medium text-gray-700">
+                      القسم *
+                    </label>
+                    <button
+                      type="button"
+                      onClick={fetchCategories}
+                      className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
+                      title="تحديث قائمة الأقسام"
+                    >
+                      🔄 تحديث
+                    </button>
+                  </div>
                   <select
                     value={formData.category_id}
                     onChange={(e) =>
@@ -466,7 +475,7 @@ export default function AdminProductsPage() {
                     <option value="">-- اختر القسم --</option>
                     {categories.map((cat) => (
                       <option key={cat.id} value={cat.id}>
-                        {cat.name}
+                        {cat.name}{!cat.is_active ? " (غير نشط)" : ""}
                       </option>
                     ))}
                   </select>
