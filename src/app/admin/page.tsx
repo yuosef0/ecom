@@ -130,7 +130,7 @@ export default function AdminDashboard() {
                   إجمالي الإيرادات
                 </p>
                 <p className="text-2xl font-bold leading-tight tracking-light text-slate-900 dark:text-white">
-                  {stats.totalRevenue.toLocaleString("ar-SA")} ر.س
+                  {stats.totalRevenue.toLocaleString("ar-SA")} جنيه
                 </p>
                 <p className="text-base font-medium leading-normal text-green-600 dark:text-green-400">
                   {stats.revenueGrowth}
@@ -220,7 +220,7 @@ export default function AdminDashboard() {
                             {order.customer_name || "عميل"}
                           </td>
                           <td className="h-[72px] px-4 py-2 text-sm font-normal leading-normal text-slate-500 dark:text-slate-400">
-                            {order.total_amount.toFixed(0)} ر.س
+                            {order.total_amount.toFixed(0)} جنيه
                           </td>
                           <td className="h-[72px] px-4 py-2 text-sm font-normal leading-normal">
                             {getStatusBadge(order.order_status)}

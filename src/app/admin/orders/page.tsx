@@ -421,7 +421,7 @@ export default function AdminOrdersPage() {
                           {order.customer_name}
                         </td>
                         <td className="px-4 py-3 text-slate-700 dark:text-slate-300 text-sm">
-                          {order.total_amount.toFixed(2)} ر.س
+                          {order.total_amount.toFixed(2)} جنيه
                         </td>
                         <td className="px-4 py-3">
                           <span
@@ -640,10 +640,10 @@ export default function AdminOrdersPage() {
                       </div>
                       <div className="text-left">
                         <p className="font-semibold text-slate-900 dark:text-white">
-                          {(item.price * item.quantity).toFixed(2)} ر.س
+                          {(item.price * item.quantity).toFixed(2)} جنيه
                         </p>
                         <p className="text-sm text-slate-600 dark:text-slate-400">
-                          {item.price.toFixed(2)} ر.س × {item.quantity}
+                          {item.price.toFixed(2)} جنيه × {item.quantity}
                         </p>
                       </div>
                     </div>
@@ -656,7 +656,7 @@ export default function AdminOrdersPage() {
                 <div className="flex justify-between text-lg font-bold">
                   <span className="text-slate-900 dark:text-white">الإجمالي:</span>
                   <span className="text-[#137fec]">
-                    {selectedOrder.total_amount.toFixed(2)} ر.س
+                    {selectedOrder.total_amount.toFixed(2)} جنيه
                   </span>
                 </div>
               </div>

@@ -8,6 +8,8 @@ interface ThemeColors {
   primary_hover: string;
   top_bar_bg: string;
   button_text: string;
+  price_color: string;
+  product_card_bg: string;
 }
 
 interface ThemeContextType {
@@ -21,6 +23,8 @@ const defaultColors: ThemeColors = {
   primary_hover: "#cc0000",
   top_bar_bg: "#e60000",
   button_text: "#ffffff",
+  price_color: "#e60000",
+  product_card_bg: "#ffffff",
 };
 
 const ThemeContext = createContext<ThemeContextType>({
@@ -83,6 +87,8 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
       root.style.setProperty("--color-primary-hover", themeColors.primary_hover);
       root.style.setProperty("--color-top-bar-bg", themeColors.top_bar_bg);
       root.style.setProperty("--color-button-text", themeColors.button_text);
+      root.style.setProperty("--color-price", themeColors.price_color);
+      root.style.setProperty("--color-product-card-bg", themeColors.product_card_bg);
     }
   };
 

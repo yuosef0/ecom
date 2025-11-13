@@ -350,7 +350,7 @@ export default function AdminCouponsPage() {
                     className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#137fec]"
                   >
                     <option value="percentage">نسبة مئوية (%)</option>
-                    <option value="fixed">قيمة ثابتة (ر.س)</option>
+                    <option value="fixed">قيمة ثابتة (جنيه)</option>
                   </select>
                 </div>
               </div>
@@ -373,7 +373,7 @@ export default function AdminCouponsPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                    قيمة الخصم * ({formData.discount_type === "percentage" ? "%" : "ر.س"})
+                    قيمة الخصم * ({formData.discount_type === "percentage" ? "%" : "جنيه"})
                   </label>
                   <input
                     type="number"
@@ -389,7 +389,7 @@ export default function AdminCouponsPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                    الحد الأدنى للشراء (ر.س)
+                    الحد الأدنى للشراء (جنيه)
                   </label>
                   <input
                     type="number"

@@ -105,9 +105,8 @@ export default function Home() {
       router.push("/");
       setSelectedCategory(null);
     } else {
-      // عرض فئة معينة
-      router.push(`/?category=${categorySlug}`);
-      setSelectedCategory(categoryName);
+      // الانتقال لصفحة الفئة
+      router.push(`/category/${categorySlug}`);
     }
   };
 
@@ -403,7 +402,8 @@ export default function Home() {
                         <Link
                           key={product.id}
                           href={`/products/${product.slug || product.id}`}
-                          className="flex flex-col gap-3 pb-3 bg-white dark:bg-[#2d1616] rounded-lg shadow-sm overflow-hidden group hover:shadow-md transition-shadow duration-300"
+                          className="flex flex-col gap-3 pb-3 rounded-lg shadow-sm overflow-hidden group hover:shadow-md transition-shadow duration-300"
+                          style={{ backgroundColor: 'var(--color-product-card-bg)' }}
                         >
                           <div className="relative w-full aspect-[3/4] overflow-hidden bg-[#f5f5f5] dark:bg-[#281313]">
                             {productImage ? (
@@ -432,7 +432,7 @@ export default function Home() {
                               {product.title}
                             </p>
                             <div className="flex items-baseline gap-2 mt-1">
-                              <p className="text-lg font-bold text-[#e60000]">
+                              <p className="text-lg font-bold" style={{ color: 'var(--color-price)' }}>
                                 {product.price.toFixed(2)} جنيه
                               </p>
                               {hasDiscount && (

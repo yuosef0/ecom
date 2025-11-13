@@ -861,7 +861,7 @@ export default function AdminProductsPage() {
                             {category?.name || "غير محدد"}
                           </td>
                           <td className="px-4 py-2 text-slate-500 dark:text-slate-400">
-                            {product.price.toFixed(2)} ر.س
+                            {product.price.toFixed(2)} جنيه
                           </td>
                           <td className="px-4 py-2">
                             <span className={stockStatus.className}>

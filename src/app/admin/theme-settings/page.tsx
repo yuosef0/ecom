@@ -88,6 +88,8 @@ export default function AdminThemeSettingsPage() {
       primary_hover: "#cc0000",
       top_bar_bg: "#e60000",
       button_text: "#ffffff",
+      price_color: "#e60000",
+      product_card_bg: "#ffffff",
     };
     setFormData(defaults);
     setMessage("⚠️ تم إعادة تعيين الألوان الافتراضية. اضغط 'حفظ' لتطبيق التغييرات");
@@ -242,6 +244,44 @@ export default function AdminThemeSettingsPage() {
                     >
                       شراء الآن
                     </button>
+                  </div>
+                </div>
+
+                {/* Price Preview */}
+                <div>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
+                    الأسعار:
+                  </p>
+                  <div className="flex gap-4 items-baseline">
+                    <p className="text-2xl font-bold" style={{ color: formData.price_color || "#e60000" }}>
+                      299.00 جنيه
+                    </p>
+                    <p className="text-lg text-gray-500 line-through">
+                      399.00 جنيه
+                    </p>
+                  </div>
+                </div>
+
+                {/* Product Card Preview */}
+                <div>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
+                    كارد المنتج:
+                  </p>
+                  <div
+                    className="max-w-xs rounded-lg shadow-md overflow-hidden"
+                    style={{ backgroundColor: formData.product_card_bg || "#ffffff" }}
+                  >
+                    <div className="aspect-[3/4] bg-gray-200 flex items-center justify-center">
+                      <span className="text-4xl">📦</span>
+                    </div>
+                    <div className="p-4">
+                      <p className="text-base font-medium text-gray-900 mb-2">
+                        اسم المنتج
+                      </p>
+                      <p className="text-lg font-bold" style={{ color: formData.price_color || "#e60000" }}>
+                        299.00 جنيه
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -311,7 +311,7 @@ export default function ProductDetailPage() {
 
               {/* Price */}
               <div className="flex items-baseline gap-3">
-                <p className="text-[#e60000] text-3xl font-bold">{product.price.toFixed(2)} جنيه</p>
+                <p className="text-3xl font-bold" style={{ color: 'var(--color-price)' }}>{product.price.toFixed(2)} جنيه</p>
                 {hasDiscount && (
                   <p className="text-[#666666] dark:text-[#aaaaaa] text-xl line-through">
                     {product.old_price!.toFixed(2)} جنيه

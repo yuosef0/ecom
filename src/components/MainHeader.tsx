@@ -275,7 +275,7 @@ export default function MainHeader() {
             {categories.map((category) => (
               <Link
                 key={category.id}
-                href={`/?category=${category.slug}`}
+                href={`/category/${category.slug}`}
                 className="text-base font-medium hover:text-[#e60000] transition-colors text-[#333333] dark:text-[#f0f0f0]"
               >
                 {category.name}
