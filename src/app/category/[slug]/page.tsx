@@ -49,21 +49,30 @@ export default function CategoryPage() {
       setLoading(true);
       setError(null);
 
+      console.log("Fetching category with slug:", categorySlug);
+
       // جلب بيانات الفئة
       const { data: categoryData, error: categoryError } = await supabase
         .from("categories")
         .select("*")
         .eq("slug", categorySlug)
-        .eq("is_active", true)
-        .single();
+        .maybeSingle();
 
       if (categoryError) {
         console.error("خطأ في جلب الفئة:", categoryError);
+        setError("حدث خطأ في تحميل الفئة");
+        setLoading(false);
+        return;
+      }
+
+      if (!categoryData) {
+        console.warn("الفئة غير موجودة:", categorySlug);
         setError("لم يتم العثور على هذه الفئة");
         setLoading(false);
         return;
       }
 
+      console.log("Category found:", categoryData);
       setCategory(categoryData);
 
       // جلب المنتجات الخاصة بالفئة
@@ -71,13 +80,15 @@ export default function CategoryPage() {
         .from("products")
         .select("*")
         .eq("category_id", categoryData.id)
-        .eq("is_active", true)
         .order("created_at", { ascending: false });
 
       if (productsError) {
         console.error("خطأ في جلب المنتجات:", productsError);
-        setError("حدث خطأ في تحميل المنتجات");
+        console.error("Products error details:", productsError);
+        // لا نعرض خطأ للمستخدم، فقط نعرض صفحة فارغة
+        setProducts([]);
       } else {
+        console.log(`Found ${productsData?.length || 0} products`);
         setProducts(productsData || []);
       }
     } catch (error) {

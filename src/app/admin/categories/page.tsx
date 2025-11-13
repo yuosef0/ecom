@@ -69,7 +69,11 @@ export default function AdminCategoriesPage() {
     try {
       const categoryData = {
         name: formData.name,
-        slug: formData.slug.toLowerCase().replace(/\s+/g, "-"),
+        slug: formData.slug
+          .toLowerCase()
+          .trim()
+          .replace(/\s+/g, "-")
+          .replace(/[^\u0600-\u06FFa-z0-9-]/g, ""),
         description: formData.description || null,
         parent_id: formData.parent_id || null,
         display_order: Number(formData.display_order),
@@ -450,8 +454,9 @@ export default function AdminCategoriesPage() {
                         slug: !editingCategory
                           ? newName
                               .toLowerCase()
+                              .trim()
                               .replace(/\s+/g, "-")
-                              .replace(/[^a-z0-9-]/g, "")
+                              .replace(/[^\u0600-\u06FFa-z0-9-]/g, "")
                           : formData.slug,
                       });
                     }}
@@ -474,7 +479,7 @@ export default function AdminCategoriesPage() {
                     }
                     required
                     className="form-input w-full rounded-lg border border-slate-300 bg-slate-50 p-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#137fec] focus:ring-[#137fec] dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder:text-slate-500 dark:focus:border-[#137fec] dark:focus:ring-[#137fec]"
-                    placeholder="مثال: men-clothing"
+                    placeholder="مثال: رجالي أو men-clothing"
                   />
                 </label>
 
