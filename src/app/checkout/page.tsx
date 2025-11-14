@@ -27,29 +27,56 @@ export default function CheckoutPage() {
     return total + item.price * item.quantity;
   }, 0);
 
-  // تحميل بيانات المستخدم من profiles
+  // تحميل بيانات المستخدم من profiles أو localStorage
   useEffect(() => {
     const loadUserData = async () => {
-      if (!user) return;
+      // أولاً، حاول تحميل البيانات من localStorage (من صفحة السلة)
+      const savedData = localStorage.getItem("checkoutInfo");
+      if (savedData) {
+        try {
+          const { customerInfo, appliedCoupon, timestamp } = JSON.parse(savedData);
 
-      try {
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", user.id)
-          .single();
+          // تحقق من أن البيانات لا تتجاوز 30 دقيقة
+          const thirtyMinutes = 30 * 60 * 1000;
+          if (Date.now() - timestamp < thirtyMinutes) {
+            if (customerInfo) {
+              setName(customerInfo.name || "");
+              setEmail(customerInfo.email || "");
+              setPhone(customerInfo.phone || "");
+              setAddress(customerInfo.address || "");
+              setCity(customerInfo.city || "");
+            }
+          } else {
+            // البيانات قديمة، امسحها
+            localStorage.removeItem("checkoutInfo");
+          }
+        } catch (error) {
+          console.error("خطأ في قراءة البيانات المحفوظة:", error);
+          localStorage.removeItem("checkoutInfo");
+        }
+      }
 
-        if (data && !error) {
-          setName(data.full_name || "");
-          setPhone(data.phone || "");
-          setAddress(data.address || "");
-          setCity(data.city || "");
+      // إذا لم توجد بيانات في localStorage، حاول تحميلها من profile المستخدم
+      if (!savedData && user) {
+        try {
+          const { data, error } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", user.id)
+            .single();
+
+          if (data && !error) {
+            setName(data.full_name || "");
+            setPhone(data.phone || "");
+            setAddress(data.address || "");
+            setCity(data.city || "");
+            setEmail(user.email || "");
+          }
+        } catch (error) {
+          // في حالة الخطأ، نستخدم بيانات user_metadata
+          setName(user.user_metadata?.full_name || "");
           setEmail(user.email || "");
         }
-      } catch (error) {
-        // في حالة الخطأ، نستخدم بيانات user_metadata
-        setName(user.user_metadata?.full_name || "");
-        setEmail(user.email || "");
       }
     };
 
